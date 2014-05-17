@@ -37,8 +37,6 @@
 # 2014-05-11:	Fork de Serie_vers_Afficheur_Uno_MAIN.py
 #				Adaptation:
 #					suppression des boutons, slider, progressbar etc
-# 2014-05-17:	Ajout réception série dans le textCtrl (aide miniterm.py de pySerial)
-#				Ajout Led ERR rouge/gris clignotant, si erreur definition port COM
 #
 #####################################################################################
 # TODO:
@@ -62,31 +60,41 @@ from time import sleep
 import os
 # gestion des tâches
 import threading
-import sys
-import platform
 
 # variables globales
 global COMselectGbl
 global COMvitesseGbl
 global statusRunStopGbl
-global compteurGbl
-global erreurGbl
-global erreurBlinkGbl
 
-LF = serial.to_bytes([10])
-CR = serial.to_bytes([13])
-CRLF = serial.to_bytes([13, 10])
-CONVERT_CRLF = 2
-CONVERT_CR   = 1
-CONVERT_LF   = 0
-NEWLINE_CONVERISON_MAP = (LF, CR, CRLF)
-LF_MODES = ('LF', 'CR', 'CR/LF')
+# Evénement lié au port série
+SERIALRX = wx.NewEventType()
+# bind to serial data receive events
+EVT_SERIALRX = wx.PyEventBinder(SERIALRX, 0)
+
+class SerialRxEvent(wx.PyCommandEvent):
+	eventType = SERIALRX
+	def __init__(self, windowID, data):
+		wx.PyCommandEvent.__init__(self, self.eventType, windowID)
+		self.data = data
+	def Clone(self):
+		self.__class__(self.GetId(), self.data)
+
+ID_CLEAR        = wx.NewId()
+ID_SAVEAS       = wx.NewId()
+ID_SETTINGS     = wx.NewId()
+ID_TERM         = wx.NewId()
+ID_EXIT         = wx.NewId()
+# constante caratère fin de ligne
+NEWLINE_CR      = 0
+NEWLINE_LF      = 1
+NEWLINE_CRLF    = 2
 
 
 class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# constructor
 	def __init__(self,parent):
-		#self.Bind( wx.PyEventBinder(SERIALRX, 0), self.OnSerialRead)
+		self.Bind( wx.PyEventBinder(SERIALRX, 0), self.OnSerialRead)
+		#self.Bind( wx.EVT_MENU,                   self.m_COM1mnuEvt, id = self.m_COM1mnu.GetId() )
 		# initialize parent class
 		Serial_SQL_Logger_GUI.FenetrePrincipaleClass.__init__(self,parent)
 		# création objet portSerie depuis class Srérial de lib pySerial
@@ -100,174 +108,131 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
         #self.SetTitle("Serial to SQL Logger")
         #self.SetSize((546, 383))
 		# init nom fichier+dossier
-		nomFichierDonnees = ""
-		nomDossierDonnees = ""
-        # Init des paramètres de COM
-		self.echo = False
-		self.repr_mode = 0
-		self.convert_outgoing = CONVERT_CRLF
-		self.newline = NEWLINE_CONVERISON_MAP[self.convert_outgoing]
-		self.dtr_state = True
-		self.rts_state = True
-		self.break_state = False
+        nomFichierDonnees = ""
+        nomDossierDonnees = ""
 		
-	# capture de l'événement m_timer1
-	def m_timer1Evt(self,event):
-		global compteurGbl
-		global erreurGbl
-		global erreurBlinkGbl
-		compteurGbl = compteurGbl + 1
-		self.m_compteurTxt.SetLabel(str(compteurGbl))
-		# gestion Led clignotante Erreur:
-		if (erreurGbl):
-			if (erreurBlinkGbl):
-				# animation led ERR clignotante ON
-				imageLedErrOn  = wx.Bitmap("LedERR_ON.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedErrOn)
-				erreurBlinkGbl = False
-			else:
-				# animation led ERR clignotante OFF
-				imageLedErrOff  = wx.Bitmap("LedERR_OFF.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedErrOff)
-				erreurBlinkGbl = True
+	def OnSerialRead(self, event):
+		"""Handle input from the serial port."""
+		text = event.data
+		#unprintable = 
+		#if self.settings.unprintable:
+		#	text = ''.join([(c >= ' ') and c or '<%d>' % ord(c)  for c in text])
+		self.logTextCtrl.AppendText(text)
+
+	#def __attach_events(self):
+		#register events at the controls
+		#self.Bind(EVT_SERIALRX, self.OnSerialRead)
+		#self.Bind(wx.EVT_CLOSE, self.OnClose)
+
+	def ComPortThread(self):
+		"""Thread that handles the incomming traffic. Does the basic input
+			transformation (newlines) and generates an SerialRxEvent"""
+		while self.alive.isSet():				#loop while alive event is true
+			#text = self.portSerie.read(1)		#read one, with timout
+			#text = ""		#read one, with timout
+			if text:							#check if not timeout
+				n = self.portSerie.inWaiting()		#look if there is more to read
+				if n:
+					text = text + self.portSerie.read(n) #get it
+				#newline transformation
+				setting = NEWLINE_CRLF
+				if setting == NEWLINE_CR:
+					text = text.replace('\r', '\n')
+				elif setting == NEWLINE_LF:
+					pass
+				elif setting == NEWLINE_CRLF:
+					text = text.replace('\r\n', '\n')
+				event = SerialRxEvent(self.GetId(), text)
+				self.GetEventHandler().AddPendingEvent(event)
+				
+	def StartThread(self):
+		# défini la tache surveillance réception série (fonction ComPortThread)
+		self.thread = threading.Thread(target=self.ComPortThread)
+		self.thread.setDaemon(1)
+		self.alive.set()
+		try:
+			self.thread.start()
+		except:
+			print('Erreur StartThread')
+			boxErr = wx.MessageDialog(None,'Erreur StartThread', 'Erreur lecture fichier:', wx.OK)
+			reponse=boxErr.ShowModal()
+			boxErr.Destroy()
+
+	def StopThread(self):
+		"""Stop the receiver thread, wait util it's finished."""
+		if self.thread is not None:
+			self.alive.clear()			#clear alive event for thread
+			self.thread.join()			#wait until thread has finished
+			self.thread = None
+
+	def OnClose(self, event):
+		"""Called on application shutdown."""
+		self.StopThread()				#stop reader thread
+		self.portSerie.close()			#cleanup
+		self.Destroy()					#close windows, exit app
 
 	# capture de l'événement clic 'RUN'
 	def m_bntRunEvt(self,event):
 		global COMselectGbl
 		global COMvitesseGbl
-		global erreurGbl
 		print("Capture evenement bouton RUN")
-		# START si port série déjà pas ouvert
-		if not self.portSerie.isOpen(): 
-			# test si variable COMselectGbl est definie
+		# test si variable COMselectGbl est definie
+		try:
+			COMselectGbl
+		except NameError:
+			print('Port serie non defini.')
+			boxErr = wx.MessageDialog(None,'Port serie non defini.', 'Erreur:', wx.OK)
+			reponse=boxErr.ShowModal()
+			boxErr.Destroy()
+		# la variable est definie, on continue
+		else:
+			#initialisation et ouverture du port série
 			try:
-				COMselectGbl
-			except NameError:
-				print('Port serie non defini.')
-				erreurGbl = True
-				boxErr = wx.MessageDialog(None,'Port serie non defini.', 'Erreur:', wx.OK)
+				#self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
+				#self.portSerie.portstr  = str(COMselectGbl)
+				#self.portSerie.baudrate = int(COMvitesseGbl)
+				self.portSerie.portstr  = "COM4"
+				#self.portSerie.baudrate = 115200
+				#self.portSerie.open()
+			except Exception:
+				print('Erreur avec le port serie '+COMselectGbl)
+				boxErr = wx.MessageDialog(None,'Erreur avec le port serie '+COMselectGbl, 'Erreur:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
-			# la variable est definie, on continue
 			else:
-				#initialisation et ouverture du port série
-				try:
-					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
-				except Exception:
-					print('Erreur avec le port serie '+COMselectGbl)
-					erreurGbl = True
-					boxErr = wx.MessageDialog(None,'Erreur avec le port serie '+COMselectGbl, 'Erreur:', wx.OK)
-					reponse=boxErr.ShowModal()
-					boxErr.Destroy()
-				else:
-					# pas d'erreur, on continue:
-					erreurGbl = False
-					self.portSerie.timeout = 0.5   #make sure that the alive event can be checked from time to time
-					# animation led run
-					imageLedRun  = wx.Bitmap("LedRUN.png",  wx.BITMAP_TYPE_ANY)
-					self.m_bmpRunStop.SetBitmap(imageLedRun)
-					print('Port serie '+COMselectGbl+' ouvert.')
-					# flag appli en run
-					global statusRunStopGbl
-					statusRunStopGbl = 1
-					# démarrage scrutation réception série
-					self._start_reader()
-					
+				# pas d'erreur, on continue:
+				self.portSerie.timeout = 0.5   #make sure that the alive event can be checked from time to time
+				# animation led run
+				imageLedRun  = wx.Bitmap("LedRUN.png",  wx.BITMAP_TYPE_ANY)
+				self.m_bmpRunStop.SetBitmap(imageLedRun)
+				print('Port serie '+COMselectGbl+' ouvert.')
+				# flag appli en run
+				global statusRunStopGbl
+				statusRunStopGbl = 1
+				# démarrage scrutation réception série
+				self.StartThread()
+				
 	# capture de l'événement clic 'STOP'
 	def m_bntStopEvt(self,event):
 		global COMselectGbl
-		global erreurGbl
 		print("Capture evenement bouton STOP")
-		erreurGbl = False
-		imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-		self.m_bmpRunStop.SetBitmap(imageLedStop)
-		# STOP si port série déjà ouvert
-		if self.portSerie.isOpen(): 
-			# Arrêt de la scrutation réception série
-			if self.alive and self._reader_alive:
-				print('Arret de la scrutation reception serie.')
-				self._stop_reader()
-				#Fermeture du pour série
-				try:
-					self.portSerie.close()
-				except NameError:
-					print('Erreur a la fermeture du Port serie '+COMselectGbl)
-					erreurGbl = True
-					boxErr = wx.MessageDialog(None,'Erreur a la fermeture du Port serie '+COMselectGbl, 'Erreur:', wx.OK)
-					reponse=boxErr.ShowModal()
-					boxErr.Destroy()
-				else:
-					# pas d'erreur, on continue:
-					erreurGbl = False
-					# Fermeture du port série
-					print('Port serie '+COMselectGbl+' ferme.')
-					imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-					self.m_bmpRunStop.SetBitmap(imageLedStop)
-					global statusRunStopGbl
-					statusRunStopGbl = 0
-	
-	# START: regroupe les fonctions tâche Reception
-	def _start_reader(self):
-		"""Start reader thread"""
-		self.alive = True
-		self._reader_alive = True
-		# start serial->console thread
-		self.receiver_thread = threading.Thread(target=self.reader)
-		self.receiver_thread.setDaemon(True)
-		self.receiver_thread.start()
-
-	# STOP: Arrêt tâche de Reception
-	def _stop_reader(self):
-		"""Stop reader thread only, wait for clean exit of thread"""
-		self.receiver_thread._Thread__stop()
-		self.alive = False
-		self._reader_alive = False
-		self.receiver_thread.join()
-		
-	# Lecture du port Série			
-	def reader(self):
-		# la liste texte est: logTextCtrl.Value = ""
-		"""loop and copy serial->console"""
+		#Fermeture du pour série
 		try:
-			while self.alive and self._reader_alive:
-				#data = character(self.serial.read(1))
-				data = self.portSerie.read(1)
-				if self.repr_mode == 0:
-					# direct output, just have to care about newline setting
-					if data == '\r' and self.convert_outgoing == CONVERT_CR:
-						#sys.stdout.write('\n')
-						self.logTextCtrl.Value = self.logTextCtrl.Value + '\n'
-					else:
-						#sys.stdout.write(data)
-						self.logTextCtrl.Value = self.logTextCtrl.Value + data
-				elif self.repr_mode == 1:
-					# escape non-printable, let pass newlines
-					if self.convert_outgoing == CONVERT_CRLF and data in '\r\n':
-						if data == '\n':
-							sys.stdout.write('\n')
-					elif data == '\r':
-						pass
-					elif data == '\n' and self.convert_outgoing == CONVERT_LF:
-						sys.stdout.write('\n')
-					elif data == '\r' and self.convert_outgoing == CONVERT_CR:
-						sys.stdout.write('\n')
-					else:
-						sys.stdout.write(repr(data)[1:-1])
-				elif self.repr_mode == 2:
-					# escape all non-printable, including newline
-					sys.stdout.write(repr(data)[1:-1])
-				elif self.repr_mode == 3:
-					# escape everything (hexdump)
-					for c in data:
-						sys.stdout.write("%s " % c.encode('hex'))
-				sys.stdout.flush()
-		except serial.SerialException, e:
-			self.alive = False
-			# would be nice if the console reader could be interruptted at this
-			# point...
-			raise
-
-
+			self.portSerie.close()
+		except NameError:
+			print('Erreur a la fermeture du Port serie '+COMselectGbl)
+			boxErr = wx.MessageDialog(None,'Erreur a la fermeture du Port serie '+COMselectGbl, 'Erreur:', wx.OK)
+			reponse=boxErr.ShowModal()
+			boxErr.Destroy()
+		else:
+			print('Port serie '+COMselectGbl+' ferme.')
+			imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
+			self.m_bmpRunStop.SetBitmap(imageLedStop)
+			global statusRunStopGbl
+			statusRunStopGbl = 0
+			self.StopThread()               #stop reader thread
+			self.portSerie.close()             #cleanup
+					
 	
 	######## MENU [Fichier] ########
 	# capture de l'événement selection menu <Nouveau>
@@ -640,19 +605,13 @@ def enableCOM(COMname):
 
 
 #================ DEBUT APPLI ================
-print "Architecture systeme:"
-print platform.architecture()
-print "Systeme d'exploitation:"
-print platform.platform()
 app = wx.App(False)
 #wx.InitAllImageHandlers()
 # creation de l'object screenHome depuis la class screenMain
 screenHome = screenMain(None)
 # scan port serie dispo:
 #ActualiserCOM()
-compteurGbl = 0
-erreurGbl = False
-erreurBlinkGbl = False
+
 #portSerie = serial.Serial()
 
 # init zones de status appli

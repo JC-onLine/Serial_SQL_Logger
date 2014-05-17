@@ -24,8 +24,31 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,580 ), wx.TE_MULTILINE )
+		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,550 ), wx.TE_MULTILINE )
+		self.logTextCtrl.Enable( False )
+		
 		bSizer1.Add( self.logTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_bmpRunStop = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Images/STOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		bSizer31.Add( self.m_bmpRunStop, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bntRun, 0, wx.ALL, 5 )
+		
+		self.m_bntStop = wx.Button( self, wx.ID_ANY, u"STOP", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bntStop, 0, wx.ALL, 5 )
+		
+		self.m_compteurTxt = wx.StaticText( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_compteurTxt.Wrap( -1 )
+		self.m_compteurTxt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.m_compteurTxt.SetToolTipString( u"Compteur de test" )
+		
+		bSizer31.Add( self.m_compteurTxt, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer1.Add( bSizer31, 1, wx.EXPAND, 5 )
 		
 		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -47,6 +70,10 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.SetSizer( bSizer1 )
 		self.Layout()
+		self.m_timer1 = wx.Timer()
+		self.m_timer1.SetOwner( self, wx.ID_ANY )
+		self.m_timer1.Start( 500 )
+		
 		self.m_statusBar1 = self.CreateStatusBar( 2, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_fichierMnu = wx.Menu()
@@ -68,6 +95,9 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_menubar1.Append( self.m_fichierMnu, u"Fichier" ) 
 		
 		self.m_portComMnu = wx.Menu()
+		self.m_menuVide = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"    -  -  -  -", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_menuVide )
+		
 		self.m_COMactualiserMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Actualiser>", u"Saisir au clavier le nom du port série", wx.ITEM_RADIO )
 		self.m_portComMnu.AppendItem( self.m_COMactualiserMnu )
 		
@@ -192,6 +222,9 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.m_bntRun.Bind( wx.EVT_BUTTON, self.m_bntRunEvt )
+		self.m_bntStop.Bind( wx.EVT_BUTTON, self.m_bntStopEvt )
+		self.Bind( wx.EVT_TIMER, self.m_timer1Evt, id=wx.ID_ANY )
 		self.Bind( wx.EVT_MENU, self.m_nouveauMnuEvt, id = self.m_nouveauMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_ouvrirCdeMnuEvt, id = self.m_ouvrirCdeMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_enregistrerCdeMnuEvt, id = self.m_enregistrerCdeMnu.GetId() )
@@ -233,6 +266,15 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def m_bntRunEvt( self, event ):
+		event.Skip()
+	
+	def m_bntStopEvt( self, event ):
+		event.Skip()
+	
+	def m_timer1Evt( self, event ):
+		event.Skip()
+	
 	def m_nouveauMnuEvt( self, event ):
 		event.Skip()
 	
