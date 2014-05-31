@@ -15,8 +15,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="ERR_OFF.svg"
-   inkscape:export-filename="C:\12_wxFormBuilder\Serial_SQL_Logger\Images\ERR_OFF.png"
+   sodipodi:docname="LedERR_OFF.svg"
+   inkscape:export-filename="C:\12_wxFormBuilder\Serial_SQL_Logger\Images\LedERR_OFF.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -227,7 +227,7 @@
      inkscape:label="Gloss"
      transform="translate(0,5)">
     <rect
-       style="fill:#808080;fill-opacity:1;stroke:none"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:none"
        id="rect2985"
        width="50"
        height="25"

@@ -47,7 +47,7 @@
             <property name="size">1000,700</property>
             <property name="style">wxCAPTION|wxCLOSE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU</property>
             <property name="subclass"></property>
-            <property name="title">Commandes série vers Afficheur Arduino Uno</property>
+            <property name="title">Serial SQL Logger</property>
             <property name="tooltip"></property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
@@ -118,7 +118,7 @@
                         <property name="dock">Dock</property>
                         <property name="dock_fixed">0</property>
                         <property name="docking">Left</property>
-                        <property name="enabled">0</property>
+                        <property name="enabled">1</property>
                         <property name="fg"></property>
                         <property name="floatable">1</property>
                         <property name="font"></property>
@@ -208,7 +208,7 @@
                                 <property name="aui_row"></property>
                                 <property name="best_size"></property>
                                 <property name="bg"></property>
-                                <property name="bitmap">Load From File; Images/STOP.png</property>
+                                <property name="bitmap">Load From File; LedSTOP.png</property>
                                 <property name="caption"></property>
                                 <property name="caption_visible">1</property>
                                 <property name="center_pane">0</property>
@@ -980,7 +980,7 @@
                     <property name="label">Port COM</property>
                     <property name="name">m_portComMnu</property>
                     <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="1">
+                    <object class="wxMenuItem" expanded="0">
                         <property name="bitmap"></property>
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
@@ -1323,6 +1323,81 @@
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">m_COM20mnuEvt</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">0</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_RADIO</property>
+                        <property name="label">COM21</property>
+                        <property name="name">m_COM21mnu</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">m_COM21mnuEvt</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">0</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_RADIO</property>
+                        <property name="label">COM22</property>
+                        <property name="name">m_COM22mnu</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">m_COM22mnuEvt</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">0</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_RADIO</property>
+                        <property name="label">COM23</property>
+                        <property name="name">m_COM23mnu</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">m_COM23mnuEvt</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">0</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_RADIO</property>
+                        <property name="label">COM24</property>
+                        <property name="name">m_COM24mnu</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">m_COM24mnuEvt</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">0</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_RADIO</property>
+                        <property name="label">COM25</property>
+                        <property name="name">m_COM25mnu</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">m_COM25mnuEvt</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>

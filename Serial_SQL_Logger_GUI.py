@@ -17,7 +17,7 @@ import wx.xrc
 class FenetrePrincipaleClass ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Commandes série vers Afficheur Arduino Uno", pos = wx.DefaultPosition, size = wx.Size( 1000,700 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Serial SQL Logger", pos = wx.DefaultPosition, size = wx.Size( 1000,700 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
@@ -25,13 +25,11 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,550 ), wx.TE_MULTILINE )
-		self.logTextCtrl.Enable( False )
-		
 		bSizer1.Add( self.logTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_bmpRunStop = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Images/STOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		self.m_bmpRunStop = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"LedSTOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
 		bSizer31.Add( self.m_bmpRunStop, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -184,6 +182,26 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_portComMnu.AppendItem( self.m_COM20mnu )
 		self.m_COM20mnu.Enable( False )
 		
+		self.m_COM21mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM21", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_COM21mnu )
+		self.m_COM21mnu.Enable( False )
+		
+		self.m_COM22mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM22", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_COM22mnu )
+		self.m_COM22mnu.Enable( False )
+		
+		self.m_COM23mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM23", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_COM23mnu )
+		self.m_COM23mnu.Enable( False )
+		
+		self.m_COM24mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM24", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_COM24mnu )
+		self.m_COM24mnu.Enable( False )
+		
+		self.m_COM25mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM25", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_COM25mnu )
+		self.m_COM25mnu.Enable( False )
+		
 		self.m_menubar1.Append( self.m_portComMnu, u"Port COM" ) 
 		
 		self.m_vitesseMnu = wx.Menu()
@@ -252,6 +270,11 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_COM18mnuEvt, id = self.m_COM18mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COM19mnuEvt, id = self.m_COM19mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COM20mnuEvt, id = self.m_COM20mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_COM21mnuEvt, id = self.m_COM21mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_COM22mnuEvt, id = self.m_COM22mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_COM23mnuEvt, id = self.m_COM23mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_COM24mnuEvt, id = self.m_COM24mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_COM25mnuEvt, id = self.m_COM25mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_115200mnuEvt, id = self.m_115200mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_57600mnuEvt, id = self.m_57600mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_19200mnuEvt, id = self.m_19200mnu.GetId() )
@@ -354,6 +377,21 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		event.Skip()
 	
 	def m_COM20mnuEvt( self, event ):
+		event.Skip()
+	
+	def m_COM21mnuEvt( self, event ):
+		event.Skip()
+	
+	def m_COM22mnuEvt( self, event ):
+		event.Skip()
+	
+	def m_COM23mnuEvt( self, event ):
+		event.Skip()
+	
+	def m_COM24mnuEvt( self, event ):
+		event.Skip()
+	
+	def m_COM25mnuEvt( self, event ):
 		event.Skip()
 	
 	def m_115200mnuEvt( self, event ):
