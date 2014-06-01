@@ -17,7 +17,7 @@ import wx.xrc
 class FenetrePrincipaleClass ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Serial SQL Logger", pos = wx.DefaultPosition, size = wx.Size( 1000,700 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Serial SQL Logger", pos = wx.DefaultPosition, size = wx.Size( 1000,828 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
@@ -64,6 +64,16 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		
 		bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
+		
+		bSizer4 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,140 ), wx.TE_MULTILINE )
+		self.logAppliTextCtrl.Enable( False )
+		
+		bSizer4.Add( self.logAppliTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
 		
 		
 		self.SetSizer( bSizer1 )

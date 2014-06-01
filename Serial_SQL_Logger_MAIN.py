@@ -48,6 +48,8 @@
 #				Modif self.repr_mode=1 pour gestion CRLF
 #				Ajout arrêt clignotant pendant popup open/save/saveas
 #				Essai ok: pc jc bluetooth COM20, avec VM prog08 WinCC Bac63 Ligne10 COM4
+# 2014-06-01	GUI: Ajout CtrlTxt pour zone logs appli en plus de print
+#				Ajout fonction MsgLog(self,"message") pour "logAppliTextCtrl"
 #
 #####################################################################################
 # TODO:
@@ -72,6 +74,8 @@ import platform
 # gestion des tâches
 import threading
 import sys
+# gestion du temps
+import time
 
 # variables globales
 global COMselectGbl
@@ -120,6 +124,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.dtr_state = True
 		self.rts_state = True
 		self.break_state = False
+		MsgLog(self, 'Architecture systeme  : ' + str(platform.architecture(0)) )
+		MsgLog(self, "Systeme d'exploitation: " + platform.platform())
 		
 	# capture de l'événement m_timer1
 	def m_timer1Evt(self,event):
@@ -162,6 +168,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMvitesseGbl
 		global erreurGbl
 		print("Capture evenement bouton RUN")
+		MsgLog(self,"Passage en RUN")
 		# START si port série déjà pas ouvert
 		if not self.portSerie.isOpen(): 
 			# test si variable COMselectGbl est definie
@@ -169,8 +176,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				COMselectGbl
 			except NameError:
 				print('Port serie non defini.')
+				MsgLog(self,'Erreur: Port serie non defini.')
 				erreurGbl = True
-				boxErr = wx.Messaself.logTextCtrl.WriteTextgeDialog(None,'Port serie non defini.', 'Erreur:', wx.OK)
+				boxErr = wx.MessageDialog(None,'Port serie non defini.', 'Erreur:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 			# la variable est definie, on continue
@@ -180,6 +188,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
 				except Exception:
 					print('Erreur avec le port serie '+COMselectGbl)
+					MsgLog(self,'Erreur avec le port serie '+COMselectGbl)
 					erreurGbl = True
 					boxErr = wx.MessageDialog(None,'Erreur avec le port serie '+COMselectGbl, 'Erreur:', wx.OK)
 					reponse=boxErr.ShowModal()
@@ -192,6 +201,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					imageLedRun  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
 					self.m_bmpRunStop.SetBitmap(imageLedRun)
 					print('Port serie '+COMselectGbl+' ouvert.')
+					MsgLog(self,'Port serie '+COMselectGbl+' ouvert.')
 					# flag appli en run
 					global statusRunStopGbl
 					statusRunStopGbl = 1
@@ -203,6 +213,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		global erreurGbl
 		print("Capture evenement bouton STOP")
+		MsgLog(self,'Passage en STOP')
 		erreurGbl = False
 		imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 		self.m_bmpRunStop.SetBitmap(imageLedStop)
@@ -211,12 +222,14 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			# Arrêt de la scrutation réception série
 			if self.alive and self._reader_alive:
 				print('Arret de la scrutation reception serie.')
+				MsgLog(self, 'Arret de la scrutation reception serie ' + COMselectGbl)
 				self._stop_reader()
 				#Fermeture du pour série
 				try:
 					self.portSerie.close()
 				except NameError:
 					print('Erreur a la fermeture du Port serie '+COMselectGbl)
+					MsgLog(self,'Erreur a la fermeture du Port serie '+COMselectGbl)
 					erreurGbl = True
 					boxErr = wx.MessageDialog(None,'Erreur a la fermeture du Port serie '+COMselectGbl, 'Erreur:', wx.OK)
 					reponse=boxErr.ShowModal()
@@ -226,6 +239,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					erreurGbl = False
 					# Fermeture du port série
 					print('Port serie '+COMselectGbl+' ferme.')
+					MsgLog(self,'Port serie '+COMselectGbl+' ferme.')
 					imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 					self.m_bmpRunStop.SetBitmap(imageLedStop)
 					global statusRunStopGbl
@@ -301,6 +315,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# capture de l'événement selection menu <Nouveau>
 	def m_nouveauMnuEvt(self,event):
 		print("Menu: Nouveau: Effacement des Logs")
+		MsgLog(self,'Fichier Nouveau: Effacement des Logs')
 		self.logTextCtrl.Value = ""
 	# capture de l'événement selection menu <Ouvrir>
 	def m_ouvrirCdeMnuEvt(self,event):
@@ -319,7 +334,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				pointeurFichier = file(os.path.join(self.nomDossierDonnees, self.nomFichierDonnees), 'r')
 				self.logTextCtrl.SetValue(pointeurFichier.read())
 				pointeurFichier.close()
+				MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' ouverture ok')
 			except:
+				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.nomDossierDonnees, self.nomFichierDonnees))
 				print('Erreur lecture du fichier: '+self.nomFichierDonnees)
 				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+self.nomFichierDonnees, 'Erreur lecture fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
@@ -337,8 +354,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				# accès fichier en écriture
 				pointeurFichier = file(os.path.join(self.nomDossierDonnees, self.nomFichierDonnees), 'w')
 				pointeurFichier.write(self.logTextCtrl.GetValue())
+				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' Sauvegarde ok')
 				return True
 			except:
+				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.nomDossierDonnees, self.nomFichierDonnees))
 				print('Erreur ecriture du fichier: '+self.nomFichierDonnees)
 				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.nomFichierDonnees, 'Erreur enregistrement fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
@@ -349,6 +368,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			print('Fichier sans nom: go <Enregistrer sous...> ')
 			self.m_enregistrerSousCdeMnuEvt(self)
 		disableBlinkGbl = False
+		
 	# capture de l'événement selection menu <Enregistrer sous...>
 	def m_enregistrerSousCdeMnuEvt(self,event):
 		global disableBlinkGbl
@@ -363,14 +383,17 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			if self.m_enregistrerCdeMnuEvt(self):
 				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.nomFichierDonnees+ "]")
 				print("Serial SQL Logger - [" + self.nomFichierDonnees + "]")
+				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' Sauvegarde ok')
 		disableBlinkGbl = False
 	# capture de l'événement selection menu <Quiter>
 	def m_quiterMnuEvt(self,event):
 		print("Menu: Quiter")
+		MsgLog(self,'Menu: Quiter')
 		global statusRunStopGbl
 		if (statusRunStopGbl == 1):
 			self.portSerie.close()
 			print('Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
+			MsgLog(self,'Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
 		# fermeture de l'appli
 		#screenHome.StopThread()				#stop reader thread
 		#screenHome.portSerie.close()			#cleanup
@@ -382,8 +405,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		# scan port serie dispo:
 		print("<Actualiser> ")
+		MsgLog(self,'Actualisation des Ports COM disponibles ...')
 		self.m_statusActionTextStat.SetLabel("Recherche ports COM en cours...")
-		ActualiserCOM()
+		ActualiserCOM(self)
 		print("<FIN> ")
 		self.m_statusActionTextStat.SetLabel("Recherche terminer: choisissez un port serie")
 	#  menu <Select.Manuelle>
@@ -395,6 +419,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		if box.ShowModal()==wx.ID_OK:
 			COMselectGbl=box.GetValue()
 		print("Selection manuelle: "+ COMselectGbl)
+		MsgLog(self,"Selection manuelle Port COM: "+ COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Selection manuelle: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 	# capture de l'événement selection menu COM1
@@ -402,6 +427,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM1"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM2
@@ -409,6 +435,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM2"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM3
@@ -416,6 +443,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM3"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM4
@@ -423,6 +451,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM4"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM5
@@ -430,6 +459,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM5"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM6
@@ -437,6 +467,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM6"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM7
@@ -444,6 +475,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM7"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM8
@@ -451,6 +483,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM8"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM9
@@ -458,6 +491,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM9"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM10
@@ -465,6 +499,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM10"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM11
@@ -472,6 +507,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM11"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM12
@@ -479,6 +515,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM12"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM13
@@ -486,6 +523,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM13"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM14
@@ -493,6 +531,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM14"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM15
@@ -500,6 +539,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM15"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM16
@@ -507,6 +547,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM16"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM17
@@ -514,6 +555,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM17"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM18
@@ -521,6 +563,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM18"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM19
@@ -528,6 +571,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM19"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM20
@@ -535,6 +579,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM20"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM21
@@ -542,6 +587,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM21"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM22
@@ -549,6 +595,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM22"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM23
@@ -556,6 +603,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM23"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM24
@@ -563,6 +611,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM24"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 	# menu COM25
@@ -570,61 +619,96 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		COMselectGbl = "COM25"
 		print("COMselectGbl: " + COMselectGbl)
+		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
+
 	######## MENU [Vitesse COM] ########
 	# capture de l'événement selection menu <115200 bds>
 	def m_115200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 115200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <57600 bds>
 	def m_57600mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 57600
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <19200 bds>
 	def m_19200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 19200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <9600 bds>
 	def m_9600mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 9600
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <4800 bds>
 	def m_4800mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 4800
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <2400 bds>
 	def m_2400mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 2400
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <1200 bds>
 	def m_1200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 1200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		global COMselectGbl
+		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+
 	######## MENU [Système] ########
 	# menu <gestionnaire de periphérique>
 	def m_gestPeriphMnuEvt(self,event):
 		os.startfile('devmgmt.msc')
+		MsgLog(self,"Menu Systeme: gestionnaire de peripherique")
 	######## BOUTONS + SLIDER ########
 	# supprimer..
 
-
-
-
+#####################################################
+# 					Fonction MsgLog(self,message)
+# Principe	:	Retourne l'horodatage
+#				Format: YYYY-MM-JJ HH:MM:SS espace
+# Dépandence:	import time
+# Appelé par:	Les fonction action de l'appli
+# 2014-06-01:	Création
+#####################################################
+def MsgLog(self,message):
+	#self.logAppliTextCtrl.WriteText(1, 8, wx.TextAttr("RED", "YELLOW"))
+	#self.logAppliTextCtrl.WriteText(wx.TextAttr("RED", "YELLOW"))
+	self.logAppliTextCtrl.WriteText("\n" + time.strftime("%Y-%m-%d %H:%M:%S  " + message))
+	
+#####################################################
+# 					Fonction scan()
+# Principe	:	Scan les port COM disponibles
+# Dépandence:	import serial
+# Appelé par:	Fonction ActualiserCOM()
+# 2014-04-19:	Création
+#####################################################
 def scan():
 	"""scan for available ports. return a list of tuples (num, name)"""
 	available = []
@@ -637,7 +721,14 @@ def scan():
 			pass
 	return available
 
-def ActualiserCOM():
+#####################################################
+# 					Fonction ActualiserCOM()
+# Principe	:	Désactive les ports dans le menu Port COM
+# Dépandence:	import Serial_SQL_Logger_GUI
+# Appelé par:	Fonction événement m_COMactualiserMnuEvt
+# 2014-04-19:	Création
+#####################################################
+def ActualiserCOM(self):
 	# désactivation de tous les ports dans le menu avant actualisation
 	screenHome.m_COM1mnu.Enable( False )
 	screenHome.m_COM2mnu.Enable( False )
@@ -669,9 +760,17 @@ def ActualiserCOM():
 	print "Ports dispo:"
 	for n,s in scan():
 		print "(%d) %s" % (n,s)
+		MsgLog(self,"%s" % (s))
 		# activation menu port serie en fonction des COM dispo
 		enableCOM(s)
 
+#####################################################
+# 					Fonction enableCOM(COMname)
+# Principe	:	Active les ports dans le menu Port COM
+# Dépandence:	import Serial_SQL_Logger_GUI
+# Appelé par:	Fonction ActualiserCOM()
+# 2014-04-19:	Création
+#####################################################
 def enableCOM(COMname):
 	global COMselectGbl
 	if COMname == "COM1":
@@ -737,6 +836,7 @@ print "Architecture systeme:"
 print platform.architecture()
 print "Systeme d'exploitation:"
 print platform.platform()
+
 app = wx.App(False)
 #wx.InitAllImageHandlers()
 # creation de l'object screenHome depuis la class screenMain
