@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jun  5 2014)
+## Python code generated with wxFormBuilder (version Feb 26 2014)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -68,6 +68,8 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		bSizer4 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,140 ), wx.TE_MULTILINE )
+		self.logAppliTextCtrl.Enable( False )
+		
 		bSizer4.Add( self.logAppliTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
@@ -83,65 +85,32 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_statusBar1 = self.CreateStatusBar( 2, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_fichierMnu = wx.Menu()
-		self.m_LogFileDeco = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Fichier log :", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_fichierMnu.AppendItem( self.m_LogFileDeco )
-		self.m_LogFileDeco.Enable( False )
+		self.m_nouveauMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Nouveau", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_fichierMnu.AppendItem( self.m_nouveauMnu )
 		
-		self.m_LogNewMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Nouveau log"+ u"\t" + u"CTRL+N", u"Nouveau fichier log", wx.ITEM_NORMAL )
-		self.m_LogNewMnu.SetBitmap( wx.Bitmap( u"Icons/Log/document-new.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_LogNewMnu )
+		self.m_ouvrirCdeMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Ouvrir", u"Ouvrir un fichier de commande", wx.ITEM_NORMAL )
+		self.m_fichierMnu.AppendItem( self.m_ouvrirCdeMnu )
 		
-		self.m_LogOpenMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Ouvrir log"+ u"\t" + u"CTRL+O", u"Ouvrir un fichier log", wx.ITEM_NORMAL )
-		self.m_LogOpenMnu.SetBitmap( wx.Bitmap( u"Icons/Log/document-open.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_LogOpenMnu )
+		self.m_enregistrerCdeMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Enregistrer", u"Enregistrer un fichier de commande", wx.ITEM_NORMAL )
+		self.m_fichierMnu.AppendItem( self.m_enregistrerCdeMnu )
 		
-		self.m_LogSaveMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Enregistrer log"+ u"\t" + u"CTRL+S", u"Enregistrer un fichier log", wx.ITEM_NORMAL )
-		self.m_LogSaveMnu.SetBitmap( wx.Bitmap( u"Icons/Log/document-save.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_LogSaveMnu )
+		self.m_enregistrerSousCdeMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Enregistrer sous...", u"Enregistrer un fichier de commande, sous...", wx.ITEM_NORMAL )
+		self.m_fichierMnu.AppendItem( self.m_enregistrerSousCdeMnu )
 		
-		self.m_LogSaveAsMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Enregistrer  log sous..."+ u"\t" + u"CTRL+SHIFT+S", u"Enregistrer un fichier log sous...", wx.ITEM_NORMAL )
-		self.m_LogSaveAsMnu.SetBitmap( wx.Bitmap( u"Icons/Log/document-save-as.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_LogSaveAsMnu )
-		
-		self.m_fichierMnu.AppendSeparator()
-		
-		self.m_ProfileFileDeco = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Fichier profile réglages :", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_fichierMnu.AppendItem( self.m_ProfileFileDeco )
-		self.m_ProfileFileDeco.Enable( False )
-		
-		self.m_ProfileNewMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Nouveau profile"+ u"\t" + u"CTRL+ALT+N", u"Nouveau fichier profile", wx.ITEM_NORMAL )
-		self.m_ProfileNewMnu.SetBitmap( wx.Bitmap( u"Icons/Profile/document-new.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_ProfileNewMnu )
-		
-		self.m_ProfileOpenMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Ouvrir profile"+ u"\t" + u"CTRL+ALT+O", u"Ouvrir un fichier profile", wx.ITEM_NORMAL )
-		self.m_ProfileOpenMnu.SetBitmap( wx.Bitmap( u"Icons/Profile/document-open.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_ProfileOpenMnu )
-		
-		self.m_ProfileSaveMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Enregistrer profile"+ u"\t" + u"CTRL+ALT+S", u"Enregistrer un fichier profile", wx.ITEM_NORMAL )
-		self.m_ProfileSaveMnu.SetBitmap( wx.Bitmap( u"Icons/Profile/document-save.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_ProfileSaveMnu )
-		
-		self.m_ProfileSaveAsMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"  Enregistrer profile sous..."+ u"\t" + u"CTRL+ALT+SHIFT+S", u"Enregistrer un fichier profile sous...", wx.ITEM_NORMAL )
-		self.m_ProfileSaveAsMnu.SetBitmap( wx.Bitmap( u"Icons/Profile/document-save-as.png", wx.BITMAP_TYPE_ANY ) )
-		self.m_fichierMnu.AppendItem( self.m_ProfileSaveAsMnu )
-		
-		self.m_fichierMnu.AppendSeparator()
-		
-		self.m_quiterMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Quiter"+ u"\t" + u"CTRL+Q", u"Quiter l'application", wx.ITEM_NORMAL )
-		self.m_quiterMnu.SetBitmap( wx.Bitmap( u"Icons/System/system-shutdown.png", wx.BITMAP_TYPE_ANY ) )
+		self.m_quiterMnu = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Quiter", u"Quiter l'application", wx.ITEM_NORMAL )
 		self.m_fichierMnu.AppendItem( self.m_quiterMnu )
 		
 		self.m_menubar1.Append( self.m_fichierMnu, u"Fichier" ) 
 		
 		self.m_portComMnu = wx.Menu()
-		self.m_COMactualiserMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Actualiser>", u"Saisir au clavier le nom du port série", wx.ITEM_NORMAL )
+		self.m_menuVide = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"    -  -  -  -", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_portComMnu.AppendItem( self.m_menuVide )
+		
+		self.m_COMactualiserMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Actualiser>", u"Saisir au clavier le nom du port série", wx.ITEM_RADIO )
 		self.m_portComMnu.AppendItem( self.m_COMactualiserMnu )
 		
-		self.m_COMmanuMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Sélection Manuelle>", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_COMmanuMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Sélection Manuelle>", wx.EmptyString, wx.ITEM_RADIO )
 		self.m_portComMnu.AppendItem( self.m_COMmanuMnu )
-		
-		self.m_COMnonSelect = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"Non selectionné", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COMnonSelect )
 		
 		self.m_COM1mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM1", wx.EmptyString, wx.ITEM_RADIO )
 		self.m_portComMnu.AppendItem( self.m_COM1mnu )
@@ -271,7 +240,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_systemeMnu = wx.Menu()
 		self.m_gestPeriphMnu = wx.MenuItem( self.m_systemeMnu, wx.ID_ANY, u"Gestionnaire de périphérique", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_gestPeriphMnu.SetBitmap( wx.Bitmap( u"Icons/System/applications-system.png", wx.BITMAP_TYPE_ANY ) )
 		self.m_systemeMnu.AppendItem( self.m_gestPeriphMnu )
 		
 		self.m_menubar1.Append( self.m_systemeMnu, u"Système" ) 
@@ -285,18 +253,13 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_bntRun.Bind( wx.EVT_BUTTON, self.m_bntRunEvt )
 		self.m_bntStop.Bind( wx.EVT_BUTTON, self.m_bntStopEvt )
 		self.Bind( wx.EVT_TIMER, self.m_timer1Evt, id=wx.ID_ANY )
-		self.Bind( wx.EVT_MENU, self.m_LogNewMnuEvt, id = self.m_LogNewMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_LogOpenMnuEvt, id = self.m_LogOpenMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_LogSaveMnuEvt, id = self.m_LogSaveMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_LogSaveAsMnuEvt, id = self.m_LogSaveAsMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_ProfileNewMnuEvt, id = self.m_ProfileNewMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_ProfileOpenMnuEvt, id = self.m_ProfileOpenMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_ProfileSaveMnuEvt, id = self.m_ProfileSaveMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_ProfileSaveAsMnuEvt, id = self.m_ProfileSaveAsMnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_nouveauMnuEvt, id = self.m_nouveauMnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_ouvrirCdeMnuEvt, id = self.m_ouvrirCdeMnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_enregistrerCdeMnuEvt, id = self.m_enregistrerCdeMnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_enregistrerSousCdeMnuEvt, id = self.m_enregistrerSousCdeMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_quiterMnuEvt, id = self.m_quiterMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COMactualiserMnuEvt, id = self.m_COMactualiserMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COMmanuMnuEvt, id = self.m_COMmanuMnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COMnonSelectEvt, id = self.m_COMnonSelect.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COM1mnuEvt, id = self.m_COM1mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COM2mnuEvt, id = self.m_COM2mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COM3mnuEvt, id = self.m_COM3mnu.GetId() )
@@ -345,28 +308,16 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_timer1Evt( self, event ):
 		event.Skip()
 	
-	def m_LogNewMnuEvt( self, event ):
+	def m_nouveauMnuEvt( self, event ):
 		event.Skip()
 	
-	def m_LogOpenMnuEvt( self, event ):
+	def m_ouvrirCdeMnuEvt( self, event ):
 		event.Skip()
 	
-	def m_LogSaveMnuEvt( self, event ):
+	def m_enregistrerCdeMnuEvt( self, event ):
 		event.Skip()
 	
-	def m_LogSaveAsMnuEvt( self, event ):
-		event.Skip()
-	
-	def m_ProfileNewMnuEvt( self, event ):
-		event.Skip()
-	
-	def m_ProfileOpenMnuEvt( self, event ):
-		event.Skip()
-	
-	def m_ProfileSaveMnuEvt( self, event ):
-		event.Skip()
-	
-	def m_ProfileSaveAsMnuEvt( self, event ):
+	def m_enregistrerSousCdeMnuEvt( self, event ):
 		event.Skip()
 	
 	def m_quiterMnuEvt( self, event ):
@@ -376,9 +327,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		event.Skip()
 	
 	def m_COMmanuMnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COMnonSelectEvt( self, event ):
 		event.Skip()
 	
 	def m_COM1mnuEvt( self, event ):
