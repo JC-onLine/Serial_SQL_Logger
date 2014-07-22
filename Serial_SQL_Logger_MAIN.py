@@ -50,14 +50,26 @@
 #				Essai ok: pc jc bluetooth COM20, avec VM prog08 WinCC Bac63 Ligne10 COM4
 # 2014-06-01	GUI: Ajout CtrlTxt pour zone logs appli en plus de print
 #				Ajout fonction MsgLog(self,"message") pour "logAppliTextCtrl"
+# 2014-06-15	Remplacement disableBlinkGbl par enableBlinkGbl
+# 2014-07-19	Remome wxFB nouveau/ouvrir/enreg/enreg en newLog/openLog/saveLog/saveAsLog
+#				Ajout  wxFB newProfil/openProfil/saveProfil/saveAsProfil
+# 2014-07-20	renome variable fichier en logFolderName/logFileName
+#				création gestion profile avec module ConfigParser
+# 2014-07-21	Gestion profile New/Open/Save/SaveAS
+#				Fonctions CheckCOM() CheckVitesse() pour actu selection menu depuis profile
+# 2014-07-22	Fin gestion profile conf port série, avec rappel dans titre appli
 #
 #####################################################################################
 # TODO:
-#				[ ] Marquer le nom du fichier en cours dans la barre de titre appli
-#				[ ] Raccourcie clavier Ctrl+N Ctrl+O Ctrl+S Ctrl+Shift+S Ctrl+Q
-#				[ ] Mettre une icônes dans la barre de titre appli
-#				[ ] Voir si possible de mettre icônes dans menu Fichier/ouvrir etc
-#				[ ] Detecter OS pour compatibilité Windows/Linux
+#		[ ] Marquer le nom du fichier en cours dans la barre de titre appli
+#		[x] Raccourcie clavier Ctrl+N Ctrl+O Ctrl+S Ctrl+Shift+S Ctrl+Q
+#		[ ] Mettre une icônes dans la barre de titre appli
+#		[x] Voir si possible de mettre icônes dans menu Fichier/ouvrir etc
+#		[ ] Detecter OS pour compatibilité Windows/Linux
+#		[ ]	Gestion de profile de config COM pour utilisation différent PC
+#		[ ]	Boot appli avec le dernier profile sélectionné
+#		[ ] Faire apparaitre commentaire affectation port COM ex: COM4 'Bluetooth'
+#		[ ] Ajouter zone saisie 'Terminal'
 #####################################################################################
 
 # importation la librairie wxWidget
@@ -76,6 +88,8 @@ import threading
 import sys
 # gestion du temps
 import time
+# gestion de config/profile
+import ConfigParser
 
 # variables globales
 global COMselectGbl
@@ -85,7 +99,7 @@ global compteurGbl
 global erreurGbl
 global erreurBlinkGbl
 global runBlinkGbl
-global disableBlinkGbl
+global enableBlinkGbl
 
 LF = serial.to_bytes([10])
 CR = serial.to_bytes([13])
@@ -112,10 +126,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# init titre de l'appli
 		APP_TITRE = "Serial to SQL Logger"
         #self.SetTitle("Serial to SQL Logger")
+		#screenHome.SetTitle('Serial to SQL Logger')
         #self.SetSize((546, 383))
 		# init nom fichier+dossier
-		self.nomFichierDonnees = ""
-		self.nomDossierDonnees = ""
+		self.logFileName = ""
+		self.logFolderName = ""
+		self.profileFileName   = ""
+		self.profileFolderName = ""
         # Init des paramètres de COM
 		self.echo = False
 		self.repr_mode = 1
@@ -134,11 +151,11 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global erreurBlinkGbl
 		global statusRunStopGbl
 		global runBlinkGbl
-		global disableBlinkGbl
+		global enableBlinkGbl
 		compteurGbl = compteurGbl + 1
 		self.m_compteurTxt.SetLabel(str(compteurGbl))
 		# gestion Led clignotante RUN:
-		if (statusRunStopGbl and not disableBlinkGbl):
+		if (statusRunStopGbl and enableBlinkGbl):
 			if (not runBlinkGbl):
 				# animation led RUN clignotante ON
 				imageLedRunOn  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
@@ -150,7 +167,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				self.m_bmpRunStop.SetBitmap(imageLedRunOff)
 				runBlinkGbl = False
 		# gestion Led clignotante Erreur:
-		if (erreurGbl and not disableBlinkGbl):
+		if (erreurGbl and enableBlinkGbl):
 			if (not erreurBlinkGbl):
 				# animation led ERR clignotante ON
 				imageLedErrOn  = wx.Bitmap("LedERR_ON.png",  wx.BITMAP_TYPE_ANY)
@@ -171,15 +188,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		MsgLog(self,"Passage en RUN")
 		# START si port série déjà pas ouvert
 		if not self.portSerie.isOpen(): 
-			# test si variable COMselectGbl est definie
-			try:
-				COMselectGbl
-			except NameError:
-				print('Port serie non defini.')
-				MsgLog(self,'Erreur: Port serie non defini.')
+			# test si variable COMselectGbl pas definie
+			if COMselectGbl == "Non select.":
+				print('Port serie non selectionne')
+				MsgLog(self,'Erreur: Port serie non selectionne')
 				erreurGbl = True
-				boxErr = wx.MessageDialog(None,'Port serie non defini.', 'Erreur:', wx.OK)
-				reponse=boxErr.ShowModal()
+				boxErr = wx.MessageDialog(None,'Port serie non selectionne', 'Erreur:', wx.OK)
+				reponse= boxErr.ShowModal()
 				boxErr.Destroy()
 			# la variable est definie, on continue
 			else:
@@ -224,7 +239,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				print('Arret de la scrutation reception serie.')
 				MsgLog(self, 'Arret de la scrutation reception serie ' + COMselectGbl)
 				self._stop_reader()
-				#Fermeture du pour série
+				#Fermeture du port série
 				try:
 					self.portSerie.close()
 				except NameError:
@@ -262,6 +277,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.alive = False
 		self._reader_alive = False
 		self.receiver_thread.join()
+
+
 		
 	# Lecture du port Série			
 	def reader(self):
@@ -269,6 +286,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		"""loop and copy serial->console"""
 		try:
 			while self.alive and self._reader_alive:
+				#desactive le RUN/STOP clignotant pour optimiser la réception
+				enableBlinkGbl = False
 				#data = character(self.serial.read(1))
 				data = self.portSerie.read(1)
 				if self.repr_mode == 9:
@@ -303,6 +322,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					for c in data:
 						sys.stdout.write("%s " % c.encode('hex'))
 				sys.stdout.flush()
+				enableBlinkGbl = True
 		except serial.SerialException, e:
 			self.alive = False
 			# would be nice if the console reader could be interruptted at this
@@ -312,79 +332,217 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 
 	
 	######## MENU [Fichier] ########
-	# capture de l'événement selection menu <Nouveau>
-	def m_nouveauMnuEvt(self,event):
+	# capture de l'événement selection menu <LogNew>
+	def m_LogNewMnuEvt(self,event):
 		print("Menu: Nouveau: Effacement des Logs")
 		MsgLog(self,'Fichier Nouveau: Effacement des Logs')
 		self.logTextCtrl.Value = ""
-	# capture de l'événement selection menu <Ouvrir>
-	def m_ouvrirCdeMnuEvt(self,event):
-		global nomFichierDonnees
-		global nomDossierDonnees
-		global disableBlinkGbl
-		print("Menu: Ouvrir")
-		disableBlinkGbl = True
-		popupOpen = wx.FileDialog(self, "Ouvrir", self.nomDossierDonnees, self.nomFichierDonnees,
-						"Fichier texte (*.txt)|*.txt|All Files|*.*", wx.OPEN)
+	# capture de l'événement selection menu <LogOpen>
+	def m_LogOpenMnuEvt(self,event):
+		global logFileName
+		global logFolderName
+		global enableBlinkGbl
+		print("Menu: Ouvrir Log")
+		enableBlinkGbl = False
+		popupOpen = wx.FileDialog(self, "Ouvrir fichier log", self.logFolderName, self.logFileName,
+										"Fichier texte (*.txt)|*.txt|All Files|*.*", wx.OPEN)
 		if (popupOpen.ShowModal() == wx.ID_OK):
-			self.nomFichierDonnees = popupOpen.GetFilename()
-			self.nomDossierDonnees = popupOpen.GetDirectory()
+			self.logFileName = popupOpen.GetFilename()
+			self.logFolderName = popupOpen.GetDirectory()
 			try:
 				# accès fichier en lecture
-				pointeurFichier = file(os.path.join(self.nomDossierDonnees, self.nomFichierDonnees), 'r')
+				pointeurFichier = file(os.path.join(self.logFolderName, self.logFileName), 'r')
 				self.logTextCtrl.SetValue(pointeurFichier.read())
 				pointeurFichier.close()
-				MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' ouverture ok')
+				MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.logFolderName, self.logFileName) + ' ouverture ok')
 			except:
-				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.nomDossierDonnees, self.nomFichierDonnees))
-				print('Erreur lecture du fichier: '+self.nomFichierDonnees)
-				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+self.nomFichierDonnees, 'Erreur lecture fichier:', wx.OK)
+				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+				print('Erreur lecture du fichier: '+self.logFileName)
+				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+self.logFileName, 'Erreur lecture fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 		popupOpen.Destroy()
-		disableBlinkGbl = False
-	# capture de l'événement selection menu <Enregistrer>
-	def m_enregistrerCdeMnuEvt(self,event):
-		global disableBlinkGbl
+		enableBlinkGbl = True
+	# capture de l'événement selection menu <LogSave>
+	def m_LogSaveMnuEvt(self,event):
+		global enableBlinkGbl
 		print("Menu: Enregistrer Logs")
-		disableBlinkGbl = True
+		enableBlinkGbl = False
 		# enregistre si fichier/dossier ont un nom
-		if (self.nomFichierDonnees !="") and (self.nomDossierDonnees != ""):
+		if (self.logFileName !="") and (self.logFolderName != ""):
 			try:
 				# accès fichier en écriture
-				pointeurFichier = file(os.path.join(self.nomDossierDonnees, self.nomFichierDonnees), 'w')
+				pointeurFichier = file(os.path.join(self.logFolderName, self.logFileName), 'w')
 				pointeurFichier.write(self.logTextCtrl.GetValue())
-				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' Sauvegarde ok')
+				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
 				return True
 			except:
-				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.nomDossierDonnees, self.nomFichierDonnees))
-				print('Erreur ecriture du fichier: '+self.nomFichierDonnees)
-				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.nomFichierDonnees, 'Erreur enregistrement fichier:', wx.OK)
+				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+				print('Erreur ecriture du fichier: '+self.logFileName)
+				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 				return False
 		# sinon popup <Enregistrer sous...>
 		else:
 			print('Fichier sans nom: go <Enregistrer sous...> ')
-			self.m_enregistrerSousCdeMnuEvt(self)
-		disableBlinkGbl = False
+			self.m_LogSaveAsMnuEvt(self)
+		enableBlinkGbl = True
 		
-	# capture de l'événement selection menu <Enregistrer sous...>
-	def m_enregistrerSousCdeMnuEvt(self,event):
-		global disableBlinkGbl
+	# capture de l'événement selection menu <LogSaveAs...>
+	def m_LogSaveAsMnuEvt(self,event):
+		global enableBlinkGbl
 		print("Menu: Enregistrer Logs sous...")
-		disableBlinkGbl = True
-		popupSaveAs = wx.FileDialog(self, "Enregister sous...", self.nomDossierDonnees, self.nomFichierDonnees,
+		enableBlinkGbl = False
+		popupSaveAs = wx.FileDialog(self, "Enregister fichier log sous...", self.logFolderName, self.logFileName,
 						"Fichier texte (*.txt)|*.txt|All Files|*.*", wx.SAVE)
 		if (popupSaveAs.ShowModal() == wx.ID_OK):
-			self.nomFichierDonnees = popupSaveAs.GetFilename()
-			self.nomDossierDonnees = popupSaveAs.GetDirectory()
+			self.logFileName = popupSaveAs.GetFilename()
+			self.logFolderName = popupSaveAs.GetDirectory()
 			# on réutilise la fonction d'enregistrement
-			if self.m_enregistrerCdeMnuEvt(self):
-				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.nomFichierDonnees+ "]")
-				print("Serial SQL Logger - [" + self.nomFichierDonnees + "]")
-				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.nomDossierDonnees, self.nomFichierDonnees) + ' Sauvegarde ok')
-		disableBlinkGbl = False
+			if self.m_LogSaveMnuEvt(self):
+				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.logFileName+ "]")
+				print("Serial SQL Logger - [" + self.logFileName + "]")
+				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+		enableBlinkGbl = True
+
+	# capture de l'événement selection menu <ProfileNew>
+	def m_ProfileNewMnuEvt( self, event ):
+		global AppliTitreGbl
+		global ProfileNameGbl
+		global COMselectGbl
+		global COMvitesseGbl
+		ProfileNameGbl = "Aucun"
+		self.profileFileName = ""
+		self.profileFolderName = ""
+		AppliTitreCreation()
+		screenHome.SetTitle(AppliTitreGbl)
+	# capture de l'événement selection menu <ProfileOpen>
+	def m_ProfileOpenMnuEvt( self, event ):
+		global AppliTitreGbl
+		global ProfileNameGbl
+		global COMselectGbl
+		global COMvitesseGbl
+		print("Menu: Ouvrir Profile")
+		enableBlinkGbl = False
+		popupOpen = wx.FileDialog(self, "Ouvrir fichier profile", self.profileFolderName, self.profileFileName,
+										"Fichier profile (*.cfg)|*.cfg|All Files|*.*", wx.OPEN)
+		if (popupOpen.ShowModal() == wx.ID_OK):
+			self.profileFileName   = popupOpen.GetFilename()
+			self.profileFolderName = popupOpen.GetDirectory()
+			print('popupOpen: '+self.profileFolderName+' '+self.profileFileName)
+			try:
+				# accès fichier en lecture
+				pointeurFichierProfile = file(os.path.join(self.profileFolderName, self.profileFileName), 'r')
+			except Exception:
+				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				print('Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName,
+										  self.profileFileName), 'Erreur lecture fichier:', wx.OK)
+				reponse=boxErr.ShowModal()
+				boxErr.Destroy()
+			else:
+				# pas d'erreur, le fichier est bien lu, on continue:
+				# gestion du profile avec ConfigParser:
+				profile = ConfigParser.ConfigParser()
+				# lecture du profile selectionné par popupOpen
+				profile.read(os.path.join(self.profileFolderName, self.profileFileName))
+				COMselectGbl = profile.get   ('LiaisonSerie', 'portcom')
+				COMvitesseGbl= profile.getint('LiaisonSerie', 'vitesse')
+				# test si le port série est bien sur le machine
+				try:
+					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
+				except Exception:
+					print("Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine")
+					MsgLog(self,"Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine")
+					erreurGbl = True
+					boxErr = wx.MessageDialog(None,"Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine", 'Erreur:', wx.OK)
+					reponse=boxErr.ShowModal()
+					boxErr.Destroy()
+					COMselectGbl  = "Non select."
+				else:
+					# pas d'erreur, le port serie est sur la machine, on continue:
+					erreurGbl = False
+					EnableCOM(COMselectGbl)			# autorise le COM selectionné
+					CheckCOM(COMselectGbl)			# coche la selection
+					CheckVitesse(COMvitesseGbl)		# coche la vitesse
+					self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
+					self.m_statusActionTextStat.SetLabel("Pret.")
+					MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse Port: "+ str(COMvitesseGbl))
+					self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+					# memorisation du profile pour titre appli
+					ProfileNameGbl = self.profileFileName
+					#Fermeture du pour série
+					self.portSerie.close()
+					# fermeture du fichier profile
+					pointeurFichierProfile.close()
+					MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' ouverture ok')
+			popupOpen.Destroy()
+			enableBlinkGbl = True
+			AppliTitreCreation()
+			screenHome.SetTitle(AppliTitreGbl)
+
+
+	# capture de l'événement selection menu <ProfileSave>
+	def m_ProfileSaveMnuEvt( self, event ):
+		global COMselectGbl
+		global COMvitesseGbl
+		global enableBlinkGbl
+		print("Menu: Enregistrer Profile")
+		enableBlinkGbl = False
+		# enregistre si fichier/dossier ont un nom
+		if (self.profileFileName !="") and (self.profileFolderName != ""):
+			try:
+				# accès fichier en écriture
+				pointeurFichierProfile = file(os.path.join(self.profileFolderName, self.profileFileName), 'w')
+				
+				profile = ConfigParser.ConfigParser()
+				profile.add_section('LiaisonSerie')
+				profile.set('LiaisonSerie', 'PortCOM', COMselectGbl)
+				profile.set('LiaisonSerie', 'Vitesse', COMvitesseGbl)
+				MsgLog(self,'Enregistrer profile: '+os.path.join(self.profileFolderName, self.profileFileName))
+				profile.write(open(os.path.join(self.profileFolderName, self.profileFileName), 'w'))
+				#profile.write(open('ficherdeconfig.cfg', 'w'))
+				
+				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+				return True
+			except:
+				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+				print('Erreur ecriture du fichier: '+self.logFileName)
+				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
+				reponse=boxErr.ShowModal()
+				boxErr.Destroy()
+				return False
+		# sinon popup <Enregistrer sous...>
+		else:
+			print('Fichier sans nom: go <Enregistrer Profile sous...> ')
+			self.m_ProfileSaveAsMnuEvt(self)
+		enableBlinkGbl = True
+
+		
+	# capture de l'événement selection menu <ProfileSaveAs>
+	def m_ProfileSaveAsMnuEvt( self, event ):
+		global AppliTitreGbl
+		global ProfileNameGbl
+		global enableBlinkGbl
+		print("Menu: Enregistrer Profile sous...")
+		enableBlinkGbl = False
+		popupSaveAs = wx.FileDialog(self, "Enregister fichier profile sous...", self.profileFolderName, self.profileFileName,
+						"Fichier profile (*.cfg)|*.cfg|All Files|*.*", wx.SAVE)
+		if (popupSaveAs.ShowModal() == wx.ID_OK):
+			self.profileFileName = popupSaveAs.GetFilename()
+			self.profileFolderName = popupSaveAs.GetDirectory()
+			# on réutilise la fonction d'enregistrement
+			if self.m_ProfileSaveMnuEvt(self):
+				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.profileFileName+ "]")
+				print("Serial SQL Logger - [" + self.profileFileName + "]")
+				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' Sauvegarde ok')
+				# memorisation du profile
+				ProfileNameGbl = self.profileFileName
+		enableBlinkGbl = True
+		AppliTitreCreation()
+		screenHome.SetTitle(AppliTitreGbl)
+
 	# capture de l'événement selection menu <Quiter>
 	def m_quiterMnuEvt(self,event):
 		print("Menu: Quiter")
@@ -399,6 +557,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		#screenHome.portSerie.close()			#cleanup
 		#screenHome.Destroy()					#close windows, exit app
 		screenHome.Close( True )
+
 	######## MENU [Port COM] ########
 	# menu <Actualiser>
 	def m_COMactualiserMnuEvt(self,event):
@@ -422,6 +581,16 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		MsgLog(self,"Selection manuelle Port COM: "+ COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Selection manuelle: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
+	# capture de l'événement selection menu COM non selectionné
+	def m_COMnonSelectEvt(self,event):
+		global COMselectGbl
+		global COMvitesseGbl
+		COMselectGbl = "Non select."
+		COMvitesseGbl = 115200
+		MsgLog(self,"Nouveau profile:    Port COM: "+COMselectGbl+"    Vitesse Port: "+ str(COMvitesseGbl))
+		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+		self.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
+
 	# capture de l'événement selection menu COM1
 	def m_COM1mnuEvt(self,event):
 		global COMselectGbl
@@ -630,7 +799,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 115200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <57600 bds>
 	def m_57600mnuEvt(self,event):
@@ -638,7 +807,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 57600
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <19200 bds>
 	def m_19200mnuEvt(self,event):
@@ -646,7 +815,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 19200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <9600 bds>
 	def m_9600mnuEvt(self,event):
@@ -654,7 +823,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 9600
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <4800 bds>
 	def m_4800mnuEvt(self,event):
@@ -662,7 +831,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 4800
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <2400 bds>
 	def m_2400mnuEvt(self,event):
@@ -670,7 +839,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 2400
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <1200 bds>
 	def m_1200mnuEvt(self,event):
@@ -678,7 +847,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMvitesseGbl = 1200
 		print("COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Vitesse Port "+COMselectGbl+": "+ str(COMvitesseGbl))
+		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 
 	######## MENU [Système] ########
@@ -698,13 +867,32 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 # 2014-06-01:	Création
 #####################################################
 def MsgLog(self,message):
+	global ProfileNameGbl
+	global COMselectGbl
+	global COMvitesseGbl
 	#self.logAppliTextCtrl.WriteText(1, 8, wx.TextAttr("RED", "YELLOW"))
 	#self.logAppliTextCtrl.WriteText(wx.TextAttr("RED", "YELLOW"))
 	self.logAppliTextCtrl.WriteText("\n" + time.strftime("%Y-%m-%d %H:%M:%S  " + message))
+	#screenHome.SetTitle("Serial to SQL Logger - Profile="+ProfileNameGbl+" COM="+COMselectGbl+" Vitesse="+str(COMvitesseGbl)+" bds")
+
+#####################################################
+# 					Fonction AppliTitre(self)
+# Principe	:	Retourne le titre de l'appli'
+# Dépandence:	Variables globales réglages appli
+# Appelé par:	menu ProfileOpen/ProfileSaveAS/COM/Vitesse
+# 2014-07-22:	Création
+#####################################################
+def AppliTitreCreation():
+	global AppliTitreGbl
+	global ProfileNameGbl
+	global COMselectGbl
+	global COMvitesseGbl
+	AppliTitreGbl = "Serial to SQL Logger - Profile:"+ProfileNameGbl+"  Port:"+COMselectGbl+"  Vitesse:"+str(COMvitesseGbl)+" bds"
+
 	
 #####################################################
 # 					Fonction scan()
-# Principe	:	Scan les port COM disponibles
+# Principe	:	Scan les ports COM disponibles
 # Dépandence:	import serial
 # Appelé par:	Fonction ActualiserCOM()
 # 2014-04-19:	Création
@@ -712,7 +900,7 @@ def MsgLog(self,message):
 def scan():
 	"""scan for available ports. return a list of tuples (num, name)"""
 	available = []
-	for i in range(256):
+	for i in range(100):
 		try:
 			s = serial.Serial(i)
 			available.append( (i, s.portstr))
@@ -762,16 +950,16 @@ def ActualiserCOM(self):
 		print "(%d) %s" % (n,s)
 		MsgLog(self,"%s" % (s))
 		# activation menu port serie en fonction des COM dispo
-		enableCOM(s)
+		EnableCOM(s)
 
 #####################################################
-# 					Fonction enableCOM(COMname)
+# 					Fonction EnableCOM(COMname)
 # Principe	:	Active les ports dans le menu Port COM
 # Dépandence:	import Serial_SQL_Logger_GUI
 # Appelé par:	Fonction ActualiserCOM()
 # 2014-04-19:	Création
 #####################################################
-def enableCOM(COMname):
+def EnableCOM(COMname):
 	global COMselectGbl
 	if COMname == "COM1":
 		screenHome.m_COM1mnu.Enable( True )
@@ -813,22 +1001,134 @@ def enableCOM(COMname):
 		screenHome.m_COM19mnu.Enable( True )
 	if COMname == "COM20":
 		screenHome.m_COM20mnu.Enable( True )
-	COMselectGbl = COMname
 	if COMname == "COM21":
 		screenHome.m_COM21mnu.Enable( True )
-	COMselectGbl = COMname
 	if COMname == "COM22":
 		screenHome.m_COM22mnu.Enable( True )
-	COMselectGbl = COMname
 	if COMname == "COM23":
 		screenHome.m_COM23mnu.Enable( True )
-	COMselectGbl = COMname
 	if COMname == "COM24":
 		screenHome.m_COM24mnu.Enable( True )
-	COMselectGbl = COMname
 	if COMname == "COM25":
 		screenHome.m_COM25mnu.Enable( True )
-	COMselectGbl = COMname
+
+#####################################################
+# 					Fonction CheckCOM(COMname)
+# Principe	:	Selectionne le port dans menu Port COM
+# Dépandence:	import Serial_SQL_Logger_GUI
+# Appelé par:	LectureProfile
+# 2014-07-21:	Création
+#####################################################
+def CheckCOM(COMname):
+	if COMname == "COM1":
+		screenHome.m_COM1mnu.Check( True )
+	if COMname == "COM2":
+		screenHome.m_COM2mnu.Check( True )
+	if COMname == "COM3":
+		screenHome.m_COM3mnu.Check( True )
+	if COMname == "COM4":
+		screenHome.m_COM4mnu.Check( True )
+	if COMname == "COM5":
+		screenHome.m_COM5mnu.Check( True )
+	if COMname == "COM6":
+		screenHome.m_COM6mnu.Check( True )
+	if COMname == "COM7":
+		screenHome.m_COM7mnu.Check( True )
+	if COMname == "COM8":
+		screenHome.m_COM8mnu.Check( True )
+	if COMname == "COM9":
+		screenHome.m_COM9mnu.Check( True )
+	if COMname == "COM10":
+		screenHome.m_COM10mnu.Check( True )
+	if COMname == "COM11":
+		screenHome.m_COM11mnu.Check( True )
+	if COMname == "COM12":
+		screenHome.m_COM12mnu.Check( True )
+	if COMname == "COM13":
+		screenHome.m_COM13mnu.Check( True )
+	if COMname == "COM14":
+		screenHome.m_COM14mnu.Check( True )
+	if COMname == "COM15":
+		screenHome.m_COM15mnu.Check( True )
+	if COMname == "COM16":
+		screenHome.m_COM16mnu.Check( True )
+	if COMname == "COM17":
+		screenHome.m_COM17mnu.Check( True )
+	if COMname == "COM18":
+		screenHome.m_COM18mnu.Check( True )
+	if COMname == "COM19":
+		screenHome.m_COM19mnu.Check( True )
+	if COMname == "COM20":
+		screenHome.m_COM20mnu.Check( True )
+	if COMname == "COM21":
+		screenHome.m_COM21mnu.Check( True )
+	if COMname == "COM22":
+		screenHome.m_COM22mnu.Check( True )
+	if COMname == "COM23":
+		screenHome.m_COM23mnu.Check( True )
+	if COMname == "COM24":
+		screenHome.m_COM24mnu.Check( True )
+	if COMname == "COM25":
+		screenHome.m_COM25mnu.Check( True )
+
+###############################################################
+# 					Fonction CheckVitesse(COMname)
+# Principe	:	Selectionne la vitesse dans menu Vitesse COM
+# Dépandence:	import Serial_SQL_Logger_GUI
+# Appelé par:	LectureProfile
+# 2014-07-21:	Création
+###############################################################
+def CheckVitesse(vitesse):
+	if vitesse == 115200:
+		screenHome.m_115200mnu.Check( True )
+	if vitesse == 57600:
+		screenHome.m_57600mnu.Check( True )
+	if vitesse == 19200:
+		screenHome.m_19200mnu.Check( True )
+	if vitesse == 9600:
+		screenHome.m_9600mnu.Check( True )
+	if vitesse == 4800:
+		screenHome.m_4800mnu.Check( True )
+	if vitesse == 2400:
+		screenHome.m_2400mnu.Check( True )
+	if vitesse == 1200:
+		screenHome.m_1200mnu.Check( True )
+
+###############################################################
+# 					Fonction SaveAs(self, folderName, fileName)
+# Principe	:	generique Enregistrer sous
+# Dépandence:	import wx
+# Appelé par:	Fonction m_LogSaveMnuEvt()
+#						 m_ProfileSaveMnuEvt()
+# 2014-07-20:	Création
+###############################################################
+def Save(self, folderName, fileName):
+	global COMselectGbl
+	global COMvitesseGbl
+	global enableBlinkGbl
+	print("Menu: Enregistrer Logs")
+	enableBlinkGbl = False
+	# enregistre si fichier/dossier ont un nom
+	if (self.logFileName !="") and (self.logFolderName != ""):
+		try:
+			# accès fichier en écriture
+			pointeurFichier = file(os.path.join(folderName, fileName), 'w')
+			# écriture du fichier
+			pointeurFichier.write(COMselectGbl)
+			MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+			return True
+		except:
+			MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+			print('Erreur ecriture du fichier: '+self.logFileName)
+			boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
+			reponse=boxErr.ShowModal()
+			boxErr.Destroy()
+			return False
+	# sinon popup <Enregistrer sous...>
+	else:
+		print('Fichier sans nom: go <Enregistrer sous...> ')
+		self.m_LogSaveAsMnuEvt(self)
+	enableBlinkGbl = True
 
 
 #================ DEBUT APPLI ================
@@ -847,15 +1147,18 @@ compteurGbl = 0
 erreurGbl = False
 erreurBlinkGbl = False
 runBlinkGbl = False
-disableBlinkGbl= False
+enableBlinkGbl= True
 
 #portSerie = serial.Serial()
 
 # init zones de status appli
-screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
-screenHome.m_statusComTextStat.SetLabel("Port serie: Non select.")
+AppliTitreGbl = "Serial SQL Logger"
+ProfileNameGbl= "Aucun"
+COMselectGbl  = "Non select."
 COMvitesseGbl = 115200
 statusRunStopGbl = 0
+screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
+screenHome.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
 screenHome.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 # affichage de l'écran principal
 screenHome.Show(True)
