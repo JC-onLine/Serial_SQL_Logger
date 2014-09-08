@@ -9,6 +9,7 @@
 
 import wx
 import wx.xrc
+import wx.combo
 
 ###########################################################################
 ## Class FenetrePrincipaleClass
@@ -17,71 +18,19 @@ import wx.xrc
 class FenetrePrincipaleClass ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Serial SQL Logger", pos = wx.DefaultPosition, size = wx.Size( 1000,828 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Serial SQL Logger", pos = wx.DefaultPosition, size = wx.Size( 1020,710 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		
-		bSizer1 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,550 ), wx.TE_MULTILINE )
-		bSizer1.Add( self.logTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_bmpRunStop = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"LedSTOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
-		bSizer31.Add( self.m_bmpRunStop, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer31.Add( self.m_bntRun, 0, wx.ALL, 5 )
-		
-		self.m_bntStop = wx.Button( self, wx.ID_ANY, u"STOP", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer31.Add( self.m_bntStop, 0, wx.ALL, 5 )
-		
-		self.m_compteurTxt = wx.StaticText( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_compteurTxt.Wrap( -1 )
-		self.m_compteurTxt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
-		self.m_compteurTxt.SetToolTipString( u"Compteur de test" )
-		
-		bSizer31.Add( self.m_compteurTxt, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		
-		bSizer1.Add( bSizer31, 1, wx.EXPAND, 5 )
-		
-		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_statusActionTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), 0|wx.DOUBLE_BORDER )
-		self.m_statusActionTextStat.Wrap( -1 )
-		bSizer3.Add( self.m_statusActionTextStat, 0, wx.ALL, 5 )
-		
-		self.m_statusComTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.DOUBLE_BORDER )
-		self.m_statusComTextStat.Wrap( -1 )
-		bSizer3.Add( self.m_statusComTextStat, 0, wx.ALL, 5 )
-		
-		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.DOUBLE_BORDER )
-		self.m_statusVitesseTextStat.Wrap( -1 )
-		bSizer3.Add( self.m_statusVitesseTextStat, 0, wx.ALL, 5 )
-		
-		
-		bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
-		
-		bSizer4 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,140 ), wx.TE_MULTILINE )
-		bSizer4.Add( self.logAppliTextCtrl, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		bSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
-		
-		
-		self.SetSizer( bSizer1 )
-		self.Layout()
 		self.m_timer1 = wx.Timer()
 		self.m_timer1.SetOwner( self, wx.ID_ANY )
 		self.m_timer1.Start( 500 )
 		
 		self.m_statusBar1 = self.CreateStatusBar( 2, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
+		self.m_menubar1.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		
 		self.m_fichierMnu = wx.Menu()
 		self.m_LogFileDeco = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Fichier log :", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_fichierMnu.AppendItem( self.m_LogFileDeco )
@@ -134,114 +83,14 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_menubar1.Append( self.m_fichierMnu, u"Fichier" ) 
 		
 		self.m_portComMnu = wx.Menu()
-		self.m_COMactualiserMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Actualiser>", u"Saisir au clavier le nom du port série", wx.ITEM_NORMAL )
+		self.m_COMactualiserMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Actualiser>"+ u"\t" + u"CTRL+F", u"Recherche Port COM dispo.", wx.ITEM_NORMAL )
 		self.m_portComMnu.AppendItem( self.m_COMactualiserMnu )
 		
-		self.m_COMmanuMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Sélection Manuelle>", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_COMmanuMnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"<Sélection Manuelle>"+ u"\t" + u"CTRL+M", u"Saisir au clavier le nom du port série", wx.ITEM_NORMAL )
 		self.m_portComMnu.AppendItem( self.m_COMmanuMnu )
 		
 		self.m_COMnonSelect = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"Non selectionné", wx.EmptyString, wx.ITEM_RADIO )
 		self.m_portComMnu.AppendItem( self.m_COMnonSelect )
-		
-		self.m_COM1mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM1", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM1mnu )
-		self.m_COM1mnu.Enable( False )
-		
-		self.m_COM2mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM2", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM2mnu )
-		self.m_COM2mnu.Enable( False )
-		
-		self.m_COM3mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM3", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM3mnu )
-		self.m_COM3mnu.Enable( False )
-		
-		self.m_COM4mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM4", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM4mnu )
-		self.m_COM4mnu.Enable( False )
-		
-		self.m_COM5mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM5", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM5mnu )
-		self.m_COM5mnu.Enable( False )
-		
-		self.m_COM6mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM6", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM6mnu )
-		self.m_COM6mnu.Enable( False )
-		
-		self.m_COM7mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM7", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM7mnu )
-		self.m_COM7mnu.Enable( False )
-		
-		self.m_COM8mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM8", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM8mnu )
-		self.m_COM8mnu.Enable( False )
-		
-		self.m_COM9mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM9", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM9mnu )
-		self.m_COM9mnu.Enable( False )
-		
-		self.m_COM10mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM10", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM10mnu )
-		self.m_COM10mnu.Enable( False )
-		
-		self.m_COM11mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM11", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM11mnu )
-		self.m_COM11mnu.Enable( False )
-		
-		self.m_COM12mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM12", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM12mnu )
-		self.m_COM12mnu.Enable( False )
-		
-		self.m_COM13mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM13", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM13mnu )
-		self.m_COM13mnu.Enable( False )
-		
-		self.m_COM14mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM14", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM14mnu )
-		self.m_COM14mnu.Enable( False )
-		
-		self.m_COM15mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM15", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM15mnu )
-		self.m_COM15mnu.Enable( False )
-		
-		self.m_COM16mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM16", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM16mnu )
-		self.m_COM16mnu.Enable( False )
-		
-		self.m_COM17mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM17", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM17mnu )
-		self.m_COM17mnu.Enable( False )
-		
-		self.m_COM18mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM18", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM18mnu )
-		self.m_COM18mnu.Enable( False )
-		
-		self.m_COM19mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM19", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM19mnu )
-		self.m_COM19mnu.Enable( False )
-		
-		self.m_COM20mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM20", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM20mnu )
-		self.m_COM20mnu.Enable( False )
-		
-		self.m_COM21mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM21", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM21mnu )
-		self.m_COM21mnu.Enable( False )
-		
-		self.m_COM22mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM22", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM22mnu )
-		self.m_COM22mnu.Enable( False )
-		
-		self.m_COM23mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM23", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM23mnu )
-		self.m_COM23mnu.Enable( False )
-		
-		self.m_COM24mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM24", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM24mnu )
-		self.m_COM24mnu.Enable( False )
-		
-		self.m_COM25mnu = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, u"COM25", wx.EmptyString, wx.ITEM_RADIO )
-		self.m_portComMnu.AppendItem( self.m_COM25mnu )
-		self.m_COM25mnu.Enable( False )
 		
 		self.m_menubar1.Append( self.m_portComMnu, u"Port COM" ) 
 		
@@ -278,12 +127,123 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.SetMenuBar( self.m_menubar1 )
 		
+		bSizer1 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 400,445 ), wx.TE_MULTILINE )
+		bSizer1.Add( self.logTextCtrl, 1, wx.EXPAND|wx.ALL, 5 )
+		
+		bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bntRun, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		
+		self.m_bntStop = wx.Button( self, wx.ID_ANY, u"STOP", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bntStop, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_compteurTxt = wx.StaticText( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_compteurTxt.Wrap( -1 )
+		self.m_compteurTxt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.m_compteurTxt.SetToolTipString( u"Compteur de test" )
+		
+		bSizer31.Add( self.m_compteurTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		
+		bSizer1.Add( bSizer31, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer3.SetMinSize( wx.Size( -1,32 ) ) 
+		self.m_statusActionTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusActionTextStat.Wrap( -1 )
+		bSizer3.Add( self.m_statusActionTextStat, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_statusComTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusComTextStat.Wrap( -1 )
+		bSizer3.Add( self.m_statusComTextStat, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusVitesseTextStat.Wrap( -1 )
+		bSizer3.Add( self.m_statusVitesseTextStat, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		
+		bSizer3.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_OsTxt = wx.StaticText( self, wx.ID_ANY, u"OS :", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_OsTxt.Wrap( -1 )
+		bSizer3.Add( self.m_OsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_bmpOS = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer3.Add( self.m_bmpOS, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_OSdetailsTxt = wx.StaticText( self, wx.ID_ANY, u"details", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_OSdetailsTxt.Wrap( -1 )
+		bSizer3.Add( self.m_OSdetailsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_ArchBitsTxt = wx.StaticText( self, wx.ID_ANY, u"xx bits", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_ArchBitsTxt.Wrap( -1 )
+		bSizer3.Add( self.m_ArchBitsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		
+		bSizer1.Add( bSizer3, 0, wx.EXPAND, 5 )
+		
+		bSizer4 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,100 ), wx.TE_MULTILINE )
+		self.logAppliTextCtrl.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.logAppliTextCtrl.SetMinSize( wx.Size( -1,80 ) )
+		self.logAppliTextCtrl.SetMaxSize( wx.Size( -1,80 ) )
+		
+		bSizer4.Add( self.logAppliTextCtrl, 0, wx.EXPAND|wx.ALL, 5 )
+		
+		
+		bSizer1.Add( bSizer4, 0, wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( bSizer1 )
+		self.Layout()
+		self.m_toolBar1 = self.CreateToolBar( wx.TB_FLAT|wx.TB_HORIZONTAL|wx.TB_TEXT, wx.ID_ANY ) 
+		self.m_toolBar1.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.m_toolBar1.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_toolBar1.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
+		
+		self.m_findPortTool = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"Recherche Port COM", wx.Bitmap( u"Icons/ToolBar/Find.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Rechercher les ports de communication", u"Rechercher les ports de communication", None ) 
+		
+		self.m_COMdispoTxt = wx.StaticText( self.m_toolBar1, wx.ID_ANY, u"  Port COM dispo:  ", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_COMdispoTxt.Wrap( -1 )
+		self.m_COMdispoTxt.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INFOTEXT ) )
+		
+		self.m_toolBar1.AddControl( self.m_COMdispoTxt )
+		self.m_portComCbx = wx.combo.BitmapComboBox( self.m_toolBar1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, "", 0 ) 
+		self.m_portComCbx.SetToolTipString( u"Liste des ports de communication disponible" )
+		self.m_portComCbx.SetHelpText( u"Cliquer sur <Recherche Port COM> puis choisir dans la liste" )
+		
+		self.m_toolBar1.AddControl( self.m_portComCbx )
+		self.m_toolBar1.AddSeparator()
+		
+		self.m_RunStopTool = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"RUN/STOP", wx.Bitmap( u"Icons/ToolBar/Oxygen/media-playback-start.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.m_bmpRunStop = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"LedSTOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		self.m_toolBar1.AddControl( self.m_bmpRunStop )
+		self.m_toolBar1.AddSeparator()
+		
+		self.m_staticText9 = wx.StaticText( self.m_toolBar1, wx.ID_ANY, u"123456789012345678901234567890123456789012345678901234567890", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText9.Wrap( -1 )
+		self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 71, 90, 90, False, wx.EmptyString ) )
+		self.m_staticText9.Hide()
+		
+		self.m_toolBar1.AddControl( self.m_staticText9 )
+		self.m_toolBar1.AddSeparator()
+		
+		self.m_toolQuiter = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"Quiter", wx.Bitmap( u"Icons/ToolBar/system-shutdown.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Quiter l'application", wx.EmptyString, None ) 
+		
+		self.m_toolBar1.AddSeparator()
+		
+		self.m_toolBar1.Realize() 
+		
 		
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.m_bntRun.Bind( wx.EVT_BUTTON, self.m_bntRunEvt )
-		self.m_bntStop.Bind( wx.EVT_BUTTON, self.m_bntStopEvt )
 		self.Bind( wx.EVT_TIMER, self.m_timer1Evt, id=wx.ID_ANY )
 		self.Bind( wx.EVT_MENU, self.m_LogNewMnuEvt, id = self.m_LogNewMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_LogOpenMnuEvt, id = self.m_LogOpenMnu.GetId() )
@@ -297,31 +257,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_COMactualiserMnuEvt, id = self.m_COMactualiserMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COMmanuMnuEvt, id = self.m_COMmanuMnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_COMnonSelectEvt, id = self.m_COMnonSelect.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM1mnuEvt, id = self.m_COM1mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM2mnuEvt, id = self.m_COM2mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM3mnuEvt, id = self.m_COM3mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM4mnuEvt, id = self.m_COM4mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM5mnuEvt, id = self.m_COM5mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM6mnuEvt, id = self.m_COM6mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM7mnuEvt, id = self.m_COM7mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM8mnuEvt, id = self.m_COM8mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM9mnuEvt, id = self.m_COM9mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM10mnuEvt, id = self.m_COM10mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM11mnuEvt, id = self.m_COM11mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM12mnuEvt, id = self.m_COM12mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM13mnuEvt, id = self.m_COM13mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM14mnuEvt, id = self.m_COM14mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM15mnuEvt, id = self.m_COM15mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM16mnuEvt, id = self.m_COM16mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM17mnuEvt, id = self.m_COM17mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM18mnuEvt, id = self.m_COM18mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM19mnuEvt, id = self.m_COM19mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM20mnuEvt, id = self.m_COM20mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM21mnuEvt, id = self.m_COM21mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM22mnuEvt, id = self.m_COM22mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM23mnuEvt, id = self.m_COM23mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM24mnuEvt, id = self.m_COM24mnu.GetId() )
-		self.Bind( wx.EVT_MENU, self.m_COM25mnuEvt, id = self.m_COM25mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_115200mnuEvt, id = self.m_115200mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_57600mnuEvt, id = self.m_57600mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_19200mnuEvt, id = self.m_19200mnu.GetId() )
@@ -330,18 +265,20 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_2400mnuEvt, id = self.m_2400mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_1200mnuEvt, id = self.m_1200mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_gestPeriphMnuEvt, id = self.m_gestPeriphMnu.GetId() )
+		self.m_bntRun.Bind( wx.EVT_BUTTON, self.m_bntRunEvt )
+		self.m_bntStop.Bind( wx.EVT_BUTTON, self.m_bntStopEvt )
+		self.Bind( wx.EVT_TOOL, self.m_findPortToolEvt, id = self.m_findPortTool.GetId() )
+		self.m_portComCbx.Bind( wx.EVT_COMBOBOX, self.m_portComCbxEvt )
+		self.m_portComCbx.Bind( wx.EVT_TEXT, self.m_portComCbxEvtOnText )
+		self.m_portComCbx.Bind( wx.EVT_TEXT_ENTER, self.m_portComCbxEvtOnTextEnter )
+		self.Bind( wx.EVT_TOOL, self.m_RunStopToolEvt, id = self.m_RunStopTool.GetId() )
+		self.Bind( wx.EVT_TOOL, self.m_toolQuiterEvt, id = self.m_toolQuiter.GetId() )
 	
 	def __del__( self ):
 		pass
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def m_bntRunEvt( self, event ):
-		event.Skip()
-	
-	def m_bntStopEvt( self, event ):
-		event.Skip()
-	
 	def m_timer1Evt( self, event ):
 		event.Skip()
 	
@@ -381,81 +318,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_COMnonSelectEvt( self, event ):
 		event.Skip()
 	
-	def m_COM1mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM2mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM3mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM4mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM5mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM6mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM7mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM8mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM9mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM10mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM11mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM12mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM13mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM14mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM15mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM16mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM17mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM18mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM19mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM20mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM21mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM22mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM23mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM24mnuEvt( self, event ):
-		event.Skip()
-	
-	def m_COM25mnuEvt( self, event ):
-		event.Skip()
-	
 	def m_115200mnuEvt( self, event ):
 		event.Skip()
 	
@@ -480,58 +342,28 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_gestPeriphMnuEvt( self, event ):
 		event.Skip()
 	
-
-###########################################################################
-## Class saisieComDlgClass
-###########################################################################
-
-class saisieComDlgClass ( wx.Dialog ):
-	
-	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Saisie manuelle nom du port série:", pos = wx.DefaultPosition, size = wx.Size( 376,114 ), style = wx.DEFAULT_DIALOG_STYLE|wx.STAY_ON_TOP )
-		
-		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-		
-		gSizer3 = wx.GridSizer( 2, 2, 0, 0 )
-		
-		self.m_saisieCOMtxt = wx.StaticText( self, wx.ID_ANY, u"Nom du port série : \n   exemple: COM1", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_saisieCOMtxt.Wrap( -1 )
-		gSizer3.Add( self.m_saisieCOMtxt, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.COMmanuTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		gSizer3.Add( self.COMmanuTextCtrl, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		
-		gSizer3.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		m_okCancelMnu = wx.StdDialogButtonSizer()
-		self.m_okCancelMnuOK = wx.Button( self, wx.ID_OK )
-		m_okCancelMnu.AddButton( self.m_okCancelMnuOK )
-		self.m_okCancelMnuCancel = wx.Button( self, wx.ID_CANCEL )
-		m_okCancelMnu.AddButton( self.m_okCancelMnuCancel )
-		m_okCancelMnu.Realize();
-		
-		gSizer3.Add( m_okCancelMnu, 1, wx.EXPAND|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-		
-		
-		self.SetSizer( gSizer3 )
-		self.Layout()
-		
-		self.Centre( wx.BOTH )
-		
-		# Connect Events
-		self.m_okCancelMnuCancel.Bind( wx.EVT_BUTTON, self.m_cancelMnuEvt )
-		self.m_okCancelMnuOK.Bind( wx.EVT_BUTTON, self.m_okMnuEvt )
-	
-	def __del__( self ):
-		pass
-	
-	
-	# Virtual event handlers, overide them in your derived class
-	def m_cancelMnuEvt( self, event ):
+	def m_bntRunEvt( self, event ):
 		event.Skip()
 	
-	def m_okMnuEvt( self, event ):
+	def m_bntStopEvt( self, event ):
+		event.Skip()
+	
+	def m_findPortToolEvt( self, event ):
+		event.Skip()
+	
+	def m_portComCbxEvt( self, event ):
+		event.Skip()
+	
+	def m_portComCbxEvtOnText( self, event ):
+		event.Skip()
+	
+	def m_portComCbxEvtOnTextEnter( self, event ):
+		event.Skip()
+	
+	def m_RunStopToolEvt( self, event ):
+		event.Skip()
+	
+	def m_toolQuiterEvt( self, event ):
 		event.Skip()
 	
 
