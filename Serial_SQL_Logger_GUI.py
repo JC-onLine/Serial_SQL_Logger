@@ -25,7 +25,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_timer1 = wx.Timer()
 		self.m_timer1.SetOwner( self, wx.ID_ANY )
-		self.m_timer1.Start( 500 )
+		self.m_timer1.Start( 100 )
 		
 		self.m_statusBar1 = self.CreateStatusBar( 2, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
@@ -129,23 +129,84 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 400,445 ), wx.TE_MULTILINE )
-		bSizer1.Add( self.logTextCtrl, 1, wx.EXPAND|wx.ALL, 5 )
+		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 1000,395 ), wx.TE_MULTILINE )
+		bSizer1.Add( self.logTextCtrl, 0, wx.ALL, 5 )
 		
 		bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_ExtractHorodateChk = wx.CheckBox( self, wx.ID_ANY, u"Horodatage\ninclus dans logs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_ExtractHorodateChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_ExtractCategorieChk = wx.CheckBox( self, wx.ID_ANY, u"Catégorie\ninclus dans logs", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		bSizer31.Add( self.m_ExtractCategorieChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		bSizer6 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, u"Ajout catégorie", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText11.Wrap( -1 )
+		bSizer6.Add( self.m_staticText11, 0, wx.ALL, 5 )
+		
+		self.m_CategorieTxt = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer6.Add( self.m_CategorieTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		
+		
+		bSizer31.Add( bSizer6, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_bitmap11 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bitmap11, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_ExtractPrioriteChk = wx.CheckBox( self, wx.ID_ANY, u"Priorité \nincluse dans logs", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		bSizer31.Add( self.m_ExtractPrioriteChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		bSizer7 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText12 = wx.StaticText( self, wx.ID_ANY, u"Ajout num\npriorité", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText12.Wrap( -1 )
+		bSizer7.Add( self.m_staticText12, 0, wx.ALL, 5 )
+		
+		self.m_PrioriteInt = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.SP_ARROW_KEYS, 0, 10, 1 )
+		bSizer7.Add( self.m_PrioriteInt, 0, wx.ALL, 5 )
+		
+		
+		bSizer31.Add( bSizer7, 0, 0, 5 )
+		
+		self.m_bitmap10 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bitmap10, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		bSizer5 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"Séparateur", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText10.Wrap( -1 )
+		bSizer5.Add( self.m_staticText10, 0, wx.ALL, 5 )
+		
+		m_separateurCbxChoices = []
+		self.m_separateurCbx = wx.ComboBox( self, wx.ID_ANY, u"|", wx.DefaultPosition, wx.Size( 55,-1 ), m_separateurCbxChoices, 0 )
+		self.m_separateurCbx.Enable( False )
+		
+		bSizer5.Add( self.m_separateurCbx, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer31.Add( bSizer5, 0, wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_bitmap12 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_100x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_bitmap12, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_bntRun = wx.Button( self, wx.ID_ANY, u"RUN", wx.DefaultPosition, wx.Size( 40,-1 ), 0 )
 		bSizer31.Add( self.m_bntRun, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		
-		self.m_bntStop = wx.Button( self, wx.ID_ANY, u"STOP", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bntStop = wx.Button( self, wx.ID_ANY, u"STOP", wx.DefaultPosition, wx.Size( 40,-1 ), 0 )
 		bSizer31.Add( self.m_bntStop, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
 		
 		self.m_compteurTxt = wx.StaticText( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_compteurTxt.Wrap( -1 )
 		self.m_compteurTxt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.m_compteurTxt.Hide()
 		self.m_compteurTxt.SetToolTipString( u"Compteur de test" )
 		
 		bSizer31.Add( self.m_compteurTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_btn_mysqlInsert = wx.Button( self, wx.ID_ANY, u"MySQL INSERT", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer31.Add( self.m_btn_mysqlInsert, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		bSizer1.Add( bSizer31, 0, wx.ALL|wx.EXPAND, 5 )
@@ -213,30 +274,32 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_COMdispoTxt.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INFOTEXT ) )
 		
 		self.m_toolBar1.AddControl( self.m_COMdispoTxt )
-		self.m_portComCbx = wx.combo.BitmapComboBox( self.m_toolBar1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, "", 0 ) 
+		self.m_portComCbx = wx.combo.BitmapComboBox( self.m_toolBar1, wx.ID_ANY, wx.EmptyString, wx.Point( -1,-1 ), wx.Size( -1,-1 ), "", 0 ) 
 		self.m_portComCbx.SetToolTipString( u"Liste des ports de communication disponible" )
 		self.m_portComCbx.SetHelpText( u"Cliquer sur <Recherche Port COM> puis choisir dans la liste" )
 		
 		self.m_toolBar1.AddControl( self.m_portComCbx )
+		self.m_bitmap6 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap6 )
 		self.m_toolBar1.AddSeparator()
 		
 		self.m_RunStopTool = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"RUN/STOP", wx.Bitmap( u"Icons/ToolBar/Oxygen/media-playback-start.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
-		self.m_bmpRunStop = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"LedSTOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		self.m_bitmap4 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap4 )
+		self.m_bmpRunStop = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/LED/LedSTOP.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
 		self.m_toolBar1.AddControl( self.m_bmpRunStop )
+		self.m_bitmap5 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap5 )
+		self.m_bmpCirculaire = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/Loader/icon_loader_31x31_01.png", wx.BITMAP_TYPE_ANY ), wx.Point( -1,20 ), wx.Size( -1,-1 ), 0 )
+		self.m_toolBar1.AddControl( self.m_bmpCirculaire )
+		self.m_bitmap7 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap7 )
 		self.m_toolBar1.AddSeparator()
 		
-		self.m_staticText9 = wx.StaticText( self.m_toolBar1, wx.ID_ANY, u"123456789012345678901234567890123456789012345678901234567890", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText9.Wrap( -1 )
-		self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 71, 90, 90, False, wx.EmptyString ) )
-		self.m_staticText9.Hide()
-		
-		self.m_toolBar1.AddControl( self.m_staticText9 )
-		self.m_toolBar1.AddSeparator()
-		
+		self.m_bitmap8 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_400x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap8 )
 		self.m_toolQuiter = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"Quiter", wx.Bitmap( u"Icons/ToolBar/system-shutdown.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Quiter l'application", wx.EmptyString, None ) 
-		
-		self.m_toolBar1.AddSeparator()
 		
 		self.m_toolBar1.Realize() 
 		
@@ -265,8 +328,20 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_2400mnuEvt, id = self.m_2400mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_1200mnuEvt, id = self.m_1200mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_gestPeriphMnuEvt, id = self.m_gestPeriphMnu.GetId() )
+		self.m_ExtractHorodateChk.Bind( wx.EVT_CHECKBOX, self.m_ExtractHorodateChkEvt )
+		self.m_ExtractCategorieChk.Bind( wx.EVT_CHECKBOX, self.m_ExtractCategorieChkEvt )
+		self.m_CategorieTxt.Bind( wx.EVT_TEXT, self.m_CategorieTxtEvt )
+		self.m_CategorieTxt.Bind( wx.EVT_TEXT_ENTER, self.m_CategorieTxtTextEnter )
+		self.m_ExtractPrioriteChk.Bind( wx.EVT_CHECKBOX, self.m_ExtractPrioriteChkEvt )
+		self.m_PrioriteInt.Bind( wx.EVT_SPINCTRL, self.m_PrioriteIntEvt )
+		self.m_PrioriteInt.Bind( wx.EVT_TEXT, self.m_PrioriteIntEvtTxt )
+		self.m_PrioriteInt.Bind( wx.EVT_TEXT_ENTER, self.m_PrioriteIntEvtEnter )
+		self.m_separateurCbx.Bind( wx.EVT_COMBOBOX, self.m_separateurCbxEvt )
+		self.m_separateurCbx.Bind( wx.EVT_TEXT, self.m_separateurCbxOnText )
+		self.m_separateurCbx.Bind( wx.EVT_TEXT_ENTER, self.m_separateurCbxOnTextEnter )
 		self.m_bntRun.Bind( wx.EVT_BUTTON, self.m_bntRunEvt )
 		self.m_bntStop.Bind( wx.EVT_BUTTON, self.m_bntStopEvt )
+		self.m_btn_mysqlInsert.Bind( wx.EVT_BUTTON, self.m_btn_mysqlInsertEvt )
 		self.Bind( wx.EVT_TOOL, self.m_findPortToolEvt, id = self.m_findPortTool.GetId() )
 		self.m_portComCbx.Bind( wx.EVT_COMBOBOX, self.m_portComCbxEvt )
 		self.m_portComCbx.Bind( wx.EVT_TEXT, self.m_portComCbxEvtOnText )
@@ -342,10 +417,46 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_gestPeriphMnuEvt( self, event ):
 		event.Skip()
 	
+	def m_ExtractHorodateChkEvt( self, event ):
+		event.Skip()
+	
+	def m_ExtractCategorieChkEvt( self, event ):
+		event.Skip()
+	
+	def m_CategorieTxtEvt( self, event ):
+		event.Skip()
+	
+	def m_CategorieTxtTextEnter( self, event ):
+		event.Skip()
+	
+	def m_ExtractPrioriteChkEvt( self, event ):
+		event.Skip()
+	
+	def m_PrioriteIntEvt( self, event ):
+		event.Skip()
+	
+	def m_PrioriteIntEvtTxt( self, event ):
+		event.Skip()
+	
+	def m_PrioriteIntEvtEnter( self, event ):
+		event.Skip()
+	
+	def m_separateurCbxEvt( self, event ):
+		event.Skip()
+	
+	def m_separateurCbxOnText( self, event ):
+		event.Skip()
+	
+	def m_separateurCbxOnTextEnter( self, event ):
+		event.Skip()
+	
 	def m_bntRunEvt( self, event ):
 		event.Skip()
 	
 	def m_bntStopEvt( self, event ):
+		event.Skip()
+	
+	def m_btn_mysqlInsertEvt( self, event ):
 		event.Skip()
 	
 	def m_findPortToolEvt( self, event ):

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 #####################################################################################
 #
 # 					Serial_SQL_Logger_GUI_MAIN.py
 #
-# Principe	:	Le but est derecevoir des logs depuis le port série,
+# Principe	:	Le but est de recevoir des logs depuis le port série,
 #				et de les enregistrer dans une base de données sql.
 #				Cette appli est un fork de 'Serie_vers_Afficheur_Uno_MAIN.py'
 #
@@ -67,6 +68,15 @@
 # 2014-09-08	Ajout AppliStart/AppliStop sur bouton Play/Stop toolbar test Linux Debian=ok
 #				Etude bug graphique RUN clignotant bmp ON/OFF
 #				le bug est du à la toolbar -> Déplacement du clignotant dans la toolbar
+# 2014-09-19	Ajout de png spacer pour toolbar séparation des objets
+# 2014-09-20	Ajout test MySQL MySQLdb 64bits http://www.codegood.com/archives/129
+# 2014-09-21	Recherche MySQLdb
+# 2014-09-23	Bouton MySQL INSERT fonctionne vers base serial_sql_logger Cubietruck
+# 2014-09-24	Ajout MysqlInsert sur réception CR = ok
+# 2014-09-28	Ajout chekBox pour extraction et séparation des données
+# 2014-09-29	Ajout événements checkBox + Enable/Disable Txt et comboBox
+# 2014-10-10	Modif GUI case à cocher décodage Horodatage/Catégorie/Priorité
+# 2014-10-12	Ajout selections case à cocher dans le profile de réglage
 #
 #####################################################################################
 # TODO:
@@ -81,6 +91,10 @@
 #			-> memoriser non machine et proposer la catalogue des ports COM
 #		[ ] Ajouter zone saisie 'Terminal'
 #		[ ] Ajouter animation sur bouton Play/Stop toolbar
+#		[ ] Ajouter enregistrement SQL des logs
+#		[ ] Ajouter logs des checkBox
+#		[ ] Ajouter dossier 'Progile' pour enregistrement des Profile
+#		[ ] Ajouter dossier 'Logs' pour enregistrement des Logs provenant port série
 #####################################################################################
 
 # importation la librairie wxWidget
@@ -101,8 +115,13 @@ import sys
 import time
 # gestion de config/profile
 import ConfigParser
+# gestion base MySQL
+import MySQLdb
+# gestion date/heure
+import time
 
 # variables globales
+global gSerialLog
 global COMselectGbl
 global COMvitesseGbl
 global statusRunStopGbl
@@ -111,6 +130,15 @@ global erreurGbl
 global erreurBlinkGbl
 global runBlinkGbl
 global enableBlinkGbl
+global enableErrBlinkGbl
+global bmpCirculaireIndexGbl
+global gExtractHorodatageChk
+global gExtractCategorieChk
+global gExtractCategorieTxt
+global gExtractPrioriteChk
+global gExtractPrioriteInt
+global gCaractereSeparateurTxt
+global gCaractereSeparateurEnable
 
 LF = serial.to_bytes([10])
 CR = serial.to_bytes([13])
@@ -146,28 +174,51 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.profileFolderName = ""
         # Init des paramètres de COM
 		self.echo = False
-		self.repr_mode = 1
+		self.repr_mode = 0
 		self.convert_outgoing = CONVERT_CRLF
 		self.newline = NEWLINE_CONVERISON_MAP[self.convert_outgoing]
 		self.dtr_state = True
 		self.rts_state = True
 		self.break_state = False
+		# init pointeur icones
+		self.imageOsLinux   = wx.Bitmap(os.path.join(os.path.curdir,"Icons","OS","icon_linux.png"),wx.BITMAP_TYPE_ANY)
+		self.imageOsWindows = wx.Bitmap(os.path.join(os.path.curdir,"Icons","OS","icon_windows.png"),wx.BITMAP_TYPE_ANY)
+		self.imagePlay      = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-start.png"),wx.BITMAP_TYPE_ANY)
+		self.imagePause     = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-pause.png"),wx.BITMAP_TYPE_ANY)
+		self.imageLedStop   = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedSTOP.png"   ),wx.BITMAP_TYPE_ANY)
+		self.imageLedRunOn  = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedRUN_ON.png" ),wx.BITMAP_TYPE_ANY)
+		self.imageLedRunOff = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedRUN_OFF.png"),wx.BITMAP_TYPE_ANY)
+		self.imageLedErrOn  = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedERR_ON.png" ),wx.BITMAP_TYPE_ANY)
+		self.imageLedErrOff = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedERR_OFF.png"),wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex1 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_01.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex2 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_02.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex3 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_03.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex4 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_04.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex5 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_05.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex6 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_06.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex7 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_07.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex8 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_08.png"),  wx.BITMAP_TYPE_ANY)
 		# affichage de l'OS + architecture 32/64bits
 		global g_OSname
 		global g_OSversion
 		global g_OSdistrib
 		global g_architectBits
 		if (g_OSname == 'Linux'):
-			imageOsLinux  = wx.Bitmap("icon_linux.png",  wx.BITMAP_TYPE_ANY)
-			self.m_bmpOS.SetBitmap(imageOsLinux)
+			self.m_bmpOS.SetBitmap(self.imageOsLinux)
 			self.m_OSdetailsTxt.SetLabel(g_OSdistrib)
 			MsgLog(self, "Systeme d'exploitation: " + g_OSname+'  '+g_OSdistrib+'  '+g_architectBits)
+			self.m_gestPeriphMnu.Enable(False)
 		else:
-			imageOsWindows  = wx.Bitmap("icon_windows.png",  wx.BITMAP_TYPE_ANY)
-			self.m_bmpOS.SetBitmap(imageOsWindows)
+			self.m_bmpOS.SetBitmap(self.imageOsWindows)
 			self.m_OSdetailsTxt.SetLabel(g_OSname+' '+g_OSversion)
 			MsgLog(self, "Systeme d'exploitation: " + g_OSname+'  '+g_OSversion+'  '+g_architectBits)
 		self.m_ArchBitsTxt.SetLabel(g_architectBits)
+		# ListBox Caractères séparateurs de données
+		self.m_separateurCbx.Clear()
+		self.m_separateurCbx.Append("|")
+		self.m_separateurCbx.Append(";")
+		self.m_separateurCbx.Append("*")
+		self.m_separateurCbx.Append("TAB")
 			
 		
 	# capture de l'événement m_timer1
@@ -178,32 +229,55 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global statusRunStopGbl
 		global runBlinkGbl
 		global enableBlinkGbl
+		global enableErrBlinkGbl
+		global bmpCirculaireIndexGbl
 		compteurGbl = compteurGbl + 1
+		if compteurGbl >5:
+			compteurGbl = 0
+			enableErrBlinkGbl = not enableErrBlinkGbl
 		self.m_compteurTxt.SetLabel(str(compteurGbl))
 		# gestion Led clignotante RUN:
-		if (statusRunStopGbl and enableBlinkGbl):
-			if (not runBlinkGbl):
-				# animation led RUN clignotante ON
-				imageLedRunOn  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedRunOn)
-				runBlinkGbl = True
-			else:
-				# animation led RUN clignotante OFF
-				imageLedRunOff  = wx.Bitmap("LedRUN_OFF.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedRunOff)
-				runBlinkGbl = False
+#		if (statusRunStopGbl and enableBlinkGbl):
+#			if (not runBlinkGbl):
+#				# animation led RUN clignotante ON
+#				self.m_bmpRunStop.SetBitmap(self.imageLedRunOn)
+#				runBlinkGbl = True
+#			else:
+#				# animation led RUN clignotante OFF
+#				self.m_bmpRunStop.SetBitmap(self.imageLedRunOff)
+#				runBlinkGbl = False
 		# gestion Led clignotante Erreur:
-		if (erreurGbl and enableBlinkGbl):
+		if (erreurGbl and enableErrBlinkGbl):
 			if (not erreurBlinkGbl):
 				# animation led ERR clignotante ON
-				imageLedErrOn  = wx.Bitmap("LedERR_ON.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedErrOn)
+				self.m_bmpRunStop.SetBitmap(self.imageLedErrOn)
 				erreurBlinkGbl = True
 			else:
 				# animation led ERR clignotante OFF
-				imageLedErrOff  = wx.Bitmap("LedERR_OFF.png",  wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedErrOff)
+				self.m_bmpRunStop.SetBitmap(self.imageLedErrOff)
 				erreurBlinkGbl = False
+		#gestion bmp circulaire 
+		if (statusRunStopGbl and enableBlinkGbl):
+			if bmpCirculaireIndexGbl==1:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex1)
+			elif bmpCirculaireIndexGbl==2:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex2)
+			elif bmpCirculaireIndexGbl==3:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex3)
+			elif bmpCirculaireIndexGbl==4:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex4)
+			elif bmpCirculaireIndexGbl==5:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex5)
+			elif bmpCirculaireIndexGbl==6:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex6)
+			elif bmpCirculaireIndexGbl==7:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex7)
+			elif bmpCirculaireIndexGbl==8:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex8)
+			bmpCirculaireIndexGbl=bmpCirculaireIndexGbl+1
+			if bmpCirculaireIndexGbl > 8:
+				bmpCirculaireIndexGbl = 1
+
 
 	# capture de l'événement clic 'RUN'
 	def m_bntRunEvt(self,event):
@@ -212,6 +286,98 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# capture de l'événement clic 'STOP'
 	def m_bntStopEvt(self,event):
 		self.AppliStop()
+
+	# capture de l'événement clic 'MySQL INSERT'
+	def m_btn_mysqlInsertEvt(self,event):
+		MysqlInsert(self,"Uno", "1", "Bouton Test")
+
+	# capture de l'événement click checkBox 'Extraction Horodatage'
+	def m_ExtractHorodateChkEvt(self,event):
+		# mise à jour variable globale 'Extraction Horodatage'
+		global gExtractHorodatageChk
+		if event.IsChecked():
+			gExtractHorodatageChk = True
+		else:
+			gExtractHorodatageChk = False
+		print "gExtractHorodatageChk = " + str(gExtractHorodatageChk)
+		SeparateurEnable(self)
+
+	# capture de l'événement click checkBox 'Extraction Catégorie'
+	def m_ExtractCategorieChkEvt(self,event):
+		global gExtractCategorieChk
+		# si la case 'Extraction Catégorie' est cochée
+		if event.IsChecked():
+			gExtractCategorieChk = True		# update image var globale
+			#Désactivation saisie txt 'Catégorie'
+			#car le nom de la catégorie sera extraite des logs
+			self.m_CategorieTxt.Enable(False)
+		else:
+			gExtractCategorieChk = False	# update image var globale
+			#Activation saisie txt 'catégorie'
+			#pour saisir manuellement la catégorie pour SQL
+			self.m_CategorieTxt.Enable(True)
+		print "gExtractCategorieChk = " + str(gExtractCategorieChk)
+		SeparateurEnable(self)
+
+	# capture de l'événement Saisie Text 'Catégorie'
+	def m_CategorieTxtEvt(self,event):
+		global gExtractCategorieTxt
+		gExtractCategorieTxt = self.m_CategorieTxt.GetValue()
+		print "m_CategorieTxtEvt: " + gExtractCategorieTxt
+	# capture de l'événement Saisie Text 'Catégorie'
+	def m_CategorieTxtTextEnter(self,event):
+		global gExtractCategorieTxt
+		gExtractCategorieTxt = self.m_CategorieTxt.GetValue()
+		print "m_CategorieTxtTextEnter: " + gExtractCategorieTxt
+
+	# capture de l'événement click checkBox 'Extraction Priorité'
+	def m_ExtractPrioriteChkEvt(self,event):
+		global gExtractPrioriteChk
+		# si la case 'Extraction Priorité' est cochée
+		if event.IsChecked():
+			gExtractPrioriteChk = True		# update image var globale
+			#Désactivation saisie txt 'Priorité'
+			#car le nom de la catégorie sera extraite des logs
+			self.m_PrioriteInt.Enable(False)
+		else:
+			gExtractPrioriteChk = False		# update image var globale
+			#Activation saisie txt 'Priorité'
+			#pour saisir manuellement la  Priorité pour SQL
+			self.m_PrioriteInt.Enable(True)
+		print "gExtractPrioriteChk = " + str(gExtractPrioriteChk)
+		SeparateurEnable(self)
+
+	# capture de l'événement Saisie 'Priorité' OnSpinCtrl
+	def m_PrioriteIntEvt(self,event):
+		global gExtractPrioriteInt
+		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
+		print "gExtractPrioriteInt Evt = " + str(gExtractPrioriteInt)
+	# capture de l'événement Saisie 'Priorité' OnSpinCtrlText
+	def m_PrioriteIntEvtTxt(self,event):
+		global gExtractPrioriteInt
+		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
+		print "gExtractPrioriteInt EvtTxt = " + str(gExtractPrioriteInt)
+	# capture de l'événement Saisie 'Priorité' OnSpinCtrlEnter
+	def m_PrioriteIntEvtEnter(self,event):
+		global gExtractPrioriteInt
+		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
+		print "gExtractPrioriteInt EvtEnter = " + str(gExtractPrioriteInt)
+
+	# capture de l'événement Sélection Cbo Evt 'Caractère séparateur'
+	def m_separateurCbxEvt(self,event):
+		global gCaractereSeparateurTxt
+		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
+		print("gCaractereSeparateurTxt Evt = " + gCaractereSeparateurTxt)
+	# capture de l'événement Sélection Cbo OnText 'Caractère séparateur'
+	def m_separateurCbxOnText(self,event):
+		global gCaractereSeparateurTxt
+		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
+		print("gCaractereSeparateurTxt OnText= " + gCaractereSeparateurTxt)
+	# capture de l'événement Sélection Cbo OnTextEnter 'Caractère séparateur'
+	def m_separateurCbxOnTextEnter(self,event):
+		global gCaractereSeparateurTxt
+		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
+		print("gCaractereSeparateurTxt OnTextEnter = " + gCaractereSeparateurTxt)
 
 	#####################################################
 	# 					Fonction Appli_start(self)
@@ -237,8 +403,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				boxErr.Destroy()
 				# arret clignotant ERR
 				erreurGbl = False
-				imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-				self.m_bmpRunStop.SetBitmap(imageLedStop)
+				self.m_bmpRunStop.SetBitmap(self.imageLedStop)
+				self.m_RunStopTool.SetNormalBitmap(self.imagePause)
 			# le port COM est defini, on continue
 			else:
 				#initialisation et ouverture du port série
@@ -254,15 +420,17 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					boxErr.Destroy()
 					# arret clignotant ERR
 					erreurGbl = False
-					imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-					self.m_bmpRunStop.SetBitmap(imageLedStop)
+					#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
+					self.m_bmpRunStop.SetBitmap(self.imageLedStop)
+					self.m_RunStopTool.SetNormalBitmap(self.imagePause)
 				else:
 					# pas d'erreur, on continue:
 					erreurGbl = False
 					self.portSerie.timeout = 0.5   #make sure that the alive event can be checked from time to time
 					# animation led run
-					imageLedRun  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
-					self.m_bmpRunStop.SetBitmap(imageLedRun)
+					#imageLedRun  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
+					self.m_bmpRunStop.SetBitmap(self.imageLedRunOn)
+					self.m_RunStopTool.SetNormalBitmap(self.imagePlay)
 					print('Port serie '+COMselectGbl+' ouvert.')
 					MsgLog(self,'Passage en RUN: Port serie '+COMselectGbl+' ouvert.')
 					# flag appli en run
@@ -283,8 +451,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global erreurGbl
 		print("Capture evenement bouton STOP")
 		erreurGbl = False
-		imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-		self.m_bmpRunStop.SetBitmap(imageLedStop)
+		#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
+		self.m_bmpRunStop.SetBitmap(self.imageLedStop)
+		self.m_RunStopTool.SetNormalBitmap(self.imagePause)
 		# STOP si port série déjà ouvert
 		if self.portSerie.isOpen(): 
 			# Arrêt de la scrutation réception série
@@ -308,8 +477,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					# Fermeture du port série
 					print('Passage en STOP: Port serie '+COMselectGbl+' ferme.')
 					MsgLog(self,'Port serie '+COMselectGbl+' ferme.')
-					imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
-					self.m_bmpRunStop.SetBitmap(imageLedStop)
+					#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
+					self.m_bmpRunStop.SetBitmap(self.imageLedStop)
+					self.m_RunStopTool.SetNormalBitmap(self.imagePause)
 					global statusRunStopGbl
 					statusRunStopGbl = 0
 
@@ -339,6 +509,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# la liste texte est: logTextCtrl.Value = ""
 		"""loop and copy serial->console"""
 		try:
+			global gSerialLog
 			while self.alive and self._reader_alive:
 				#desactive le RUN/STOP clignotant pour optimiser la réception
 				enableBlinkGbl = False
@@ -346,15 +517,21 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				data = self.portSerie.read(1)
 				if self.repr_mode == 9:
 					# direct output, just have to care about newline setting
-						self.logTextCtrl.WriteText(data)
+#					gSerialLog = gSerialLog + data
+					self.logTextCtrl.WriteText(data)
 				elif self.repr_mode == 0:
 					# direct output, just have to care about newline setting
-					if data == '\r' and self.convert_outgoing == CONVERT_CR:
+#					if data == '\r' and self.convert_outgoing == CONVERT_CR:
+					# si reception CR
+					if data == '\r':
 						#sys.stdout.write('\n')
 						self.logTextCtrl.WriteText('\n')
+						MysqlInsert(self,"Uno", "1", gSerialLog)
+						gSerialLog = ""
 					else:
 						#sys.stdout.write(data)
 						self.logTextCtrl.WriteText(data)
+						gSerialLog = gSerialLog + data
 				elif self.repr_mode == 1:
 					# escape non-printable, let pass newlines
 					if self.convert_outgoing == CONVERT_CRLF and data in '\r\n':
@@ -393,11 +570,17 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.logTextCtrl.Value = ""
 	# capture de l'événement selection menu <LogOpen>
 	def m_LogOpenMnuEvt(self,event):
+		global appliFolderName
 		global logFileName
 		global logFolderName
 		global enableBlinkGbl
 		print("Menu: Ouvrir Log")
 		enableBlinkGbl = False
+		# construction du chemin des Logs
+#		logFolderName = os.path.join(appliFolderName, "Logs")
+#						FileDialog(parent, message=FileSelectorPromptStr, defaultDir="", defaultFile="",
+#										   wildcard=FileSelectorDefaultWildcardStr, style=FD_DEFAULT_STYLE,
+#										   pos=DefaultPosition, size=DefaultSize, name=FileDialogNameStr)
 		popupOpen = wx.FileDialog(self, "Ouvrir fichier log", self.logFolderName, self.logFileName,
 										"Fichier texte (*.txt)|*.txt|All Files|*.*", wx.OPEN)
 		if (popupOpen.ShowModal() == wx.ID_OK):
@@ -417,6 +600,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				boxErr.Destroy()
 		popupOpen.Destroy()
 		enableBlinkGbl = True
+		
 	# capture de l'événement selection menu <LogSave>
 	def m_LogSaveMnuEvt(self,event):
 		global enableBlinkGbl
@@ -466,17 +650,33 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global ProfileNameGbl
 		global COMselectGbl
 		global COMvitesseGbl
+		# Init partie fichier profile + titre appli
 		ProfileNameGbl = "Aucun"
 		self.profileFileName = ""
 		self.profileFolderName = ""
 		AppliTitreCreation()
 		screenHome.SetTitle(AppliTitreGbl)
+		# Init partie décodage
+		self.m_ExtractHorodateChk.SetValue(False)
+		self.m_ExtractCategorieChk.SetValue(False)
+		self.m_CategorieTxt.Value = ""
+		self.m_ExtractPrioriteChk.SetValue(False)
+		self.m_PrioriteInt.Value = 0
+		self.m_separateurCbx.SetValue("")
+		self.m_separateurCbx.Enable(False)
+		
 	# capture de l'événement selection menu <ProfileOpen>
 	def m_ProfileOpenMnuEvt( self, event ):
 		global AppliTitreGbl
 		global ProfileNameGbl
 		global COMselectGbl
 		global COMvitesseGbl
+		global gExtractHorodatageChk
+		global gExtractCategorieChk
+		global gExtractCategorieTxt
+		global gExtractPrioriteChk
+		global gExtractPrioriteInt
+		global gCaractereSeparateurTxt
 		print("Menu: Ouvrir Profile")
 		enableBlinkGbl = False
 		popupOpen = wx.FileDialog(self, "Ouvrir fichier profile", self.profileFolderName, self.profileFileName,
@@ -503,7 +703,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				profile.read(os.path.join(self.profileFolderName, self.profileFileName))
 				COMselectGbl = profile.get   ('LiaisonSerie', 'portcom')
 				COMvitesseGbl= profile.getint('LiaisonSerie', 'vitesse')
-				# test si le port série est bien sur le machine
+				gExtractHorodatageChk		= profile.getboolean('Decodage_Logs', 'Extract_Horodatage_Chk')
+				gExtractCategorieChk		= profile.getboolean('Decodage_Logs', 'Extract_Categorie_Chk')
+				gExtractCategorieTxt		= profile.get(       'Decodage_Logs', 'Extract_Categorie_Txt')
+				gExtractPrioriteChk			= profile.getboolean('Decodage_Logs', 'Extract_Priorite_Chk')
+				gExtractPrioriteInt			= profile.getint(    'Decodage_Logs', 'Extract_Priorite_Txt')
+				gCaractereSeparateurTxt		= profile.get(       'Decodage_Logs', 'Caractere_Separateur_Txt')
+				# test si le port série est bien sur la machine
 				try:
 					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
 				except Exception:
@@ -524,22 +730,28 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 					# memorisation du profile pour titre appli
 					ProfileNameGbl = self.profileFileName
-					#Fermeture du pour série
+					#Fermeture du port série
 					self.portSerie.close()
 					# fermeture du fichier profile
 					pointeurFichierProfile.close()
+					DecodageRefresh(self)
 					MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' ouverture ok')
 			popupOpen.Destroy()
 			enableBlinkGbl = True
 			AppliTitreCreation()
 			screenHome.SetTitle(AppliTitreGbl)
 
-
 	# capture de l'événement selection menu <ProfileSave>
 	def m_ProfileSaveMnuEvt( self, event ):
 		global COMselectGbl
 		global COMvitesseGbl
 		global enableBlinkGbl
+		global gExtractHorodatageChk
+		global gExtractCategorieChk
+		global gExtractCategorieTxt
+		global gExtractPrioriteChk
+		global gExtractPrioriteInt
+		global gCaractereSeparateurTxt
 		print("Menu: Enregistrer Profile")
 		enableBlinkGbl = False
 		# enregistre si fichier/dossier ont un nom
@@ -547,21 +759,33 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			try:
 				# accès fichier en écriture
 				pointeurFichierProfile = file(os.path.join(self.profileFolderName, self.profileFileName), 'w')
-				
 				profile = ConfigParser.ConfigParser()
 				profile.add_section('LiaisonSerie')
 				profile.set('LiaisonSerie', 'PortCOM', COMselectGbl)
 				profile.set('LiaisonSerie', 'Vitesse', COMvitesseGbl)
+				profile.add_section('Decodage_Logs')
+				profile.set('Decodage_Logs', 'Extract_Horodatage_Chk',		str(gExtractHorodatageChk))
+				profile.set('Decodage_Logs', 'Extract_Categorie_Chk',		str(gExtractCategorieChk))
+				profile.set('Decodage_Logs', 'Extract_Categorie_Txt',		gExtractCategorieTxt)
+				profile.set('Decodage_Logs', 'Extract_Priorite_Chk',		str(gExtractPrioriteChk))
+				profile.set('Decodage_Logs', 'Extract_Priorite_Txt',		str(gExtractPrioriteInt))
+				profile.set('Decodage_Logs', 'Caractere_Separateur_Txt',	gCaractereSeparateurTxt)
+				print("Dossier = " + self.profileFolderName)
+				print("Fichier = " + self.profileFileName)
+				print("gExtractHorodatageChk      = " + str(gExtractHorodatageChk))
+				print("gExtractCategorieChk       = " + str(gExtractCategorieChk))
+				print("gExtractCategorieTxt       = " + gExtractCategorieTxt)
+				print("gExtractPrioriteChk        = " + str(gExtractPrioriteChk))
+				print("gExtractPrioriteInt        = " + str(gExtractPrioriteInt))
+				print("gCaractereSeparateurTxt    = " + gCaractereSeparateurTxt)
 				MsgLog(self,'Enregistrer profile: '+os.path.join(self.profileFolderName, self.profileFileName))
 				profile.write(open(os.path.join(self.profileFolderName, self.profileFileName), 'w'))
-				#profile.write(open('ficherdeconfig.cfg', 'w'))
-				
-				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' Sauvegarde ok')
 				return True
 			except:
-				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
-				print('Erreur ecriture du fichier: '+self.logFileName)
-				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
+				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				print('Erreur ecriture du fichier: '+self.profileFileName)
+				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.profileFileName, 'Erreur enregistrement fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 				return False
@@ -570,7 +794,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			print('Fichier sans nom: go <Enregistrer Profile sous...> ')
 			self.m_ProfileSaveAsMnuEvt(self)
 		enableBlinkGbl = True
-
+		
 		
 	# capture de l'événement selection menu <ProfileSaveAs>
 	def m_ProfileSaveAsMnuEvt( self, event ):
@@ -737,7 +961,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	########==== ToolBar ====########
 	# icone <Find Port>
 	def m_findPortToolEvt( self, event ):
-		global COMselectGbl
 		# scan port serie dispo:
 		print("<Actualiser> ")
 		MsgLog(self,'Recherche des Ports COM disponibles ...')
@@ -756,6 +979,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 
 	# Icone <Quiter>
 	def m_toolQuiterEvt(self,event):
+		global COMselectGbl
 		print("Menu: Quiter")
 		MsgLog(self,'Menu: Quiter')
 		global statusRunStopGbl
@@ -795,7 +1019,7 @@ def AppliTitreCreation():
 	global ProfileNameGbl
 	global COMselectGbl
 	global COMvitesseGbl
-	AppliTitreGbl = "Serial to SQL Logger - Profile:"+ProfileNameGbl+"  Port:"+COMselectGbl+"  Vitesse:"+str(COMvitesseGbl)+" bds"
+	AppliTitreGbl = "Serial to SQL Logger - Profile: ["+ProfileNameGbl+"]  Port:"+COMselectGbl+"  Vitesse:"+str(COMvitesseGbl)+" bds"
 
 #####################################################
 # 					Fonction scan()
@@ -894,7 +1118,7 @@ def Save(self, folderName, fileName):
 			pointeurFichier = file(os.path.join(folderName, fileName), 'w')
 			# écriture du fichier
 			pointeurFichier.write(COMselectGbl)
-			MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+			MsgLog(self,'Fichier Enregistrer: ' + os.path.join(FolderName, FileName) + ' Sauvegarde ok')
 			return True
 		except:
 			MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
@@ -909,13 +1133,110 @@ def Save(self, folderName, fileName):
 		self.m_LogSaveAsMnuEvt(self)
 	enableBlinkGbl = True
 
+#####################################################
+# 					Fonction Separateur(self)
+# Principe	:	Actualise Activation/Désactivation
+#				de la selection caractère séparateur
+# Dépandence:	Variables globales extractions
+# Appelé par:	bouton checkBox GUI
+# 2014-09-29:	Création
+#####################################################
+def SeparateurEnable(self):
+	global gExtractHorodatageChk
+	global gExtractCategorieChk
+	global gExtractPrioriteChk
+	if gExtractHorodatageChk or gExtractCategorieChk or gExtractPrioriteChk:
+		gCaractereSeparateurEnable = True		# update image variable globale
+		# Activation comboBox 'Caractère séparateur'
+		self.m_separateurCbx.Enable(True)
+	else:
+		gCaractereSeparateurEnable = False		# update image variable globale
+		# Désactivation comboBox 'Caractère séparateur'
+		self.m_separateurCbx.Enable(False)
+	#print "m_ExtractPrioriteChkEvt ",gExtractPrioriteChk
+
+#####################################################
+# 					Fonction DecodageRefresh(self)
+# Principe	:	Actualise Activation/Désactivation
+#				de la selection checkbox décodage
+# Dépandence:	Variables globales extractions
+# Appelé par:	bouton checkBox GUI
+# 2014-10-11:	Création
+#####################################################
+def DecodageRefresh(self):
+	global gExtractHorodatageChk
+	global gExtractCategorieChk
+	global gExtractCategorieTxt
+	global gExtractPrioriteChk
+	global gExtractPrioriteInt
+	global gCaractereSeparateurTxt
+	global gCaractereSeparateurEnable
+	print('gExtractHorodatageChk=      ' + str(gExtractHorodatageChk))
+	print('gExtractCategorieChk=       ' + str(gExtractCategorieChk))
+	print('gExtractCategorieTxt=       ' + gExtractCategorieTxt)
+	print('gExtractPrioriteChk=        ' + str(gExtractPrioriteChk))
+	print('gExtractPrioriteInt=        ' + str(gExtractPrioriteInt))
+	print('gCaractereSeparateurTxt=    ' + gCaractereSeparateurTxt)
+	self.m_ExtractHorodateChk.SetValue(gExtractHorodatageChk)
+	self.m_ExtractCategorieChk.SetValue(gExtractCategorieChk)
+	self.m_CategorieTxt.Value = gExtractCategorieTxt
+	self.m_ExtractPrioriteChk.SetValue(gExtractPrioriteChk)
+	self.m_PrioriteInt.Value = gExtractPrioriteInt
+	self.m_separateurCbx.SetValue(gCaractereSeparateurTxt)
+	self.m_separateurCbx.Enable(gCaractereSeparateurEnable)
+	SeparateurEnable(self)
+	
+
+#####################################################
+# 					Fonction MysqlInsert(self)
+# Principe	:	Enregistre les logs dans la base MySQL
+# Dépandence:	Aucune
+# Appelé par:	bouton GUI, fonction port série
+# 2014-09-23:	Création
+#####################################################
+def MysqlInsert(self,categorie,niv_detail,message):
+	try:
+		#MysqlInsert: print "base MySQL ouverture..."
+		db = MySQLdb.connect(host="192.168.1.150",user="root",passwd="mysql",db="serial_sql_logger")
+	except Exception:
+		# appel popup erreur connexion MySQL
+		boxErr = wx.MessageDialog(None,'Erreur connexion MySQL vers 192.168.1.150', 'Erreur:', wx.OK)
+		reponse=boxErr.ShowModal()
+		boxErr.Destroy()
+	else:
+		#print "MysqlInsert: base MySQL ouverte"
+		cur = db.cursor() 
+		dateTime= (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:00"))
+		requete=        "INSERT INTO arduino (horodatage,categorie,niv_detail,message) "
+		requete=requete+"VALUES ('"+dateTime+"','"+categorie+"','"+niv_detail+"','"+message+"')"
+		try:
+			# execute la requete
+			cur.execute(requete)
+			#print "MysqlInsert: ...Mise a jour de la base"
+			db.commit()
+		except Exception:
+			print "MysqlInsert: Erreur avec la Requete= " + requete
+			print "MysqlInsert: ...Retour etat precedant de la base"
+			db.rollback()
+		else:
+			#print "MysqlInsert: Requete executee avec:"
+			#print requete
+			db.close()
+			#print "MysqlInsert: base fermee"
+			print "MysqlInsert: ok"
+
+
+
 
 #================ DEBUT APPLI ================
+# Dossier de l'appli
+appliFolderName = os.getcwd()
+print "appliFolderName= " + appliFolderName
+# detection de l'OS
 print "Architecture systeme:"
 print platform.architecture()
 print "Systeme d'exploitation:"
 print platform.platform()
-# detection de l'OS'
 plateformeComplete = platform.platform()
 plateformeTab = plateformeComplete.split('-')
 g_OSname    = plateformeTab[0]
@@ -942,12 +1263,23 @@ erreurGbl		= False
 erreurBlinkGbl 	= False
 runBlinkGbl		= False
 enableBlinkGbl	= True
+enableErrBlinkGbl= True
+bmpCirculaireIndexGbl=1
 # init zones de status appli
 AppliTitreGbl 	= "Serial SQL Logger"
 ProfileNameGbl	= "Aucun"
 COMselectGbl  	= "Non select."
 COMvitesseGbl 	= 115200
-statusRunStopGbl = 0
+statusRunStopGbl= 0
+gSerialLog      = ""
+gExtractHorodatageChk	  = False
+gExtractCategorieChk	  = False
+gExtractCategorieTxt	  = ""
+gExtractPrioriteChk		  = False
+gExtractPrioriteInt		  = 1
+gCaractereSeparateurTxt	  = ""
+gCaractereSeparateurEnable= False
+
 screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
 screenHome.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
 screenHome.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")

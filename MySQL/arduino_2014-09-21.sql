@@ -1,0 +1,49 @@
+-- phpMyAdmin SQL Dump
+-- version 3.4.11.1deb2+deb7u1
+-- http://www.phpmyadmin.net
+--
+-- Client: localhost
+-- Généré le: Dim 21 Septembre 2014 à 19:32
+-- Version du serveur: 5.5.38
+-- Version de PHP: 5.4.4-14+deb7u12
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
+-- Base de données: `serial_sql_logger`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `arduino`
+--
+
+CREATE TABLE IF NOT EXISTS `arduino` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id unique du message',
+  `horodatage` datetime NOT NULL COMMENT 'horodatage du message',
+  `categorie` text NOT NULL COMMENT 'categorie du message',
+  `niv_detail` tinyint(4) NOT NULL COMMENT 'niveau de detail du message log',
+  `message` varchar(25) NOT NULL COMMENT 'message de log',
+  PRIMARY KEY (`horodatage`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Log des cartes Arduino' AUTO_INCREMENT=20 ;
+
+--
+-- Contenu de la table `arduino`
+--
+
+INSERT INTO `arduino` (`id`, `horodatage`, `categorie`, `niv_detail`, `message`) VALUES
+(10, '2014-09-21 10:00:00', 'robot1', 1, 'Message1'),
+(12, '2014-09-21 10:00:01', 'robot1', 1, 'Message1');
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
