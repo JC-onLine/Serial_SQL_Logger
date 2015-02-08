@@ -77,6 +77,10 @@
 # 2014-09-29	Ajout événements checkBox + Enable/Disable Txt et comboBox
 # 2014-10-10	Modif GUI case à cocher décodage Horodatage/Catégorie/Priorité
 # 2014-10-12	Ajout selections case à cocher dans le profile de réglage
+# 2015-02-07	Correction animation Play/Pause
+#				Ajout icone SQL on/off
+# 2015-02-08	Remplacement de l'animation loader
+# 2015-02-08	Mise en place sélection extraction Horodatage/Catégorie/NivDétail/MessageLog
 #
 #####################################################################################
 # TODO:
@@ -135,10 +139,11 @@ global bmpCirculaireIndexGbl
 global gExtractHorodatageChk
 global gExtractCategorieChk
 global gExtractCategorieTxt
-global gExtractPrioriteChk
-global gExtractPrioriteInt
+global gExtractNivDetailChk
+global gExtractNivDetailNum
 global gCaractereSeparateurTxt
 global gCaractereSeparateurEnable
+global gDataToSQL
 
 LF = serial.to_bytes([10])
 CR = serial.to_bytes([13])
@@ -183,21 +188,27 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# init pointeur icones
 		self.imageOsLinux   = wx.Bitmap(os.path.join(os.path.curdir,"Icons","OS","icon_linux.png"),wx.BITMAP_TYPE_ANY)
 		self.imageOsWindows = wx.Bitmap(os.path.join(os.path.curdir,"Icons","OS","icon_windows.png"),wx.BITMAP_TYPE_ANY)
-		self.imagePlay      = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-start.png"),wx.BITMAP_TYPE_ANY)
-		self.imagePause     = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-pause.png"),wx.BITMAP_TYPE_ANY)
 		self.imageLedStop   = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedSTOP.png"   ),wx.BITMAP_TYPE_ANY)
 		self.imageLedRunOn  = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedRUN_ON.png" ),wx.BITMAP_TYPE_ANY)
 		self.imageLedRunOff = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedRUN_OFF.png"),wx.BITMAP_TYPE_ANY)
 		self.imageLedErrOn  = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedERR_ON.png" ),wx.BITMAP_TYPE_ANY)
 		self.imageLedErrOff = wx.Bitmap(os.path.join(os.path.curdir,"Icons","LED","LedERR_OFF.png"),wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex1 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_01.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex2 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_02.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex3 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_03.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex4 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_04.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex5 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_05.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex6 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_06.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex7 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_07.png"),  wx.BITMAP_TYPE_ANY)
-		self.bmpCirculaireIndex8 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","icon_loader_31x31_08.png"),  wx.BITMAP_TYPE_ANY)
+		self.imagePause     = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-pause.png"),wx.BITMAP_TYPE_ANY)
+		self.imagePlay      = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","Oxygen","media-playback-start.png"),wx.BITMAP_TYPE_ANY)
+		self.imageSQLon     = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","data-enable_32x32.png"),wx.BITMAP_TYPE_ANY)
+		self.imageSQLoff    = wx.Bitmap(os.path.join(os.path.curdir,"Icons","ToolBar","data-disable_32x32.png"),wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex1 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_01.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex2 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_02.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex3 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_03.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex4 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_04.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex5 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_05.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex6 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_06.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex7 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_07.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex8 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_08.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex9 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_09.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex10 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_10.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex11 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_11.png"),  wx.BITMAP_TYPE_ANY)
+		self.bmpCirculaireIndex12 = wx.Bitmap(os.path.join(os.path.curdir,"Icons","Loader","loader_32x32_12.png"),  wx.BITMAP_TYPE_ANY)
 		# affichage de l'OS + architecture 32/64bits
 		global g_OSname
 		global g_OSversion
@@ -274,8 +285,16 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex7)
 			elif bmpCirculaireIndexGbl==8:
 				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex8)
+			elif bmpCirculaireIndexGbl==9:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex9)
+			elif bmpCirculaireIndexGbl==10:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex10)
+			elif bmpCirculaireIndexGbl==11:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex11)
+			elif bmpCirculaireIndexGbl==12:
+				self.m_bmpCirculaire.SetBitmap(self.bmpCirculaireIndex12)
 			bmpCirculaireIndexGbl=bmpCirculaireIndexGbl+1
-			if bmpCirculaireIndexGbl > 8:
+			if bmpCirculaireIndexGbl > 12:
 				bmpCirculaireIndexGbl = 1
 
 
@@ -331,37 +350,37 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		print "m_CategorieTxtTextEnter: " + gExtractCategorieTxt
 
 	# capture de l'événement click checkBox 'Extraction Priorité'
-	def m_ExtractPrioriteChkEvt(self,event):
-		global gExtractPrioriteChk
+	def m_ExtractNivDetailChkEvt(self,event):
+		global gExtractNivDetailChk
 		# si la case 'Extraction Priorité' est cochée
 		if event.IsChecked():
-			gExtractPrioriteChk = True		# update image var globale
+			gExtractNivDetailChk = True		# update image var globale
 			#Désactivation saisie txt 'Priorité'
 			#car le nom de la catégorie sera extraite des logs
-			self.m_PrioriteInt.Enable(False)
+			self.m_ExtractNivDetailNum.Enable(False)
 		else:
-			gExtractPrioriteChk = False		# update image var globale
+			gExtractNivDetailChk = False		# update image var globale
 			#Activation saisie txt 'Priorité'
 			#pour saisir manuellement la  Priorité pour SQL
-			self.m_PrioriteInt.Enable(True)
-		print "gExtractPrioriteChk = " + str(gExtractPrioriteChk)
+			self.m_ExtractNivDetailNum.Enable(True)
+		print "gExtractNivDetailChk = " + str(gExtractNivDetailChk)
 		SeparateurEnable(self)
 
-	# capture de l'événement Saisie 'Priorité' OnSpinCtrl
-	def m_PrioriteIntEvt(self,event):
-		global gExtractPrioriteInt
-		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
-		print "gExtractPrioriteInt Evt = " + str(gExtractPrioriteInt)
-	# capture de l'événement Saisie 'Priorité' OnSpinCtrlText
-	def m_PrioriteIntEvtTxt(self,event):
-		global gExtractPrioriteInt
-		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
-		print "gExtractPrioriteInt EvtTxt = " + str(gExtractPrioriteInt)
-	# capture de l'événement Saisie 'Priorité' OnSpinCtrlEnter
-	def m_PrioriteIntEvtEnter(self,event):
-		global gExtractPrioriteInt
-		gExtractPrioriteInt = self.m_PrioriteInt.GetValue()
-		print "gExtractPrioriteInt EvtEnter = " + str(gExtractPrioriteInt)
+	# capture de l'événement Saisie 'niveau détail' OnSpinCtrl
+	def m_ExtractNivDetailNumEvt(self,event):
+		global gExtractNivDetailNum
+		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
+		print "gExtractNivDetailNum Evt = " + str(gExtractNivDetailNum)
+	# capture de l'événement Saisie 'niveau détail' OnSpinCtrlText
+	def m_ExtractNivDetailNumEvtTxt(self,event):
+		global gExtractNivDetailNum
+		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
+		print "gExtractNivDetailNum EvtTxt = " + str(gExtractNivDetailNum)
+	# capture de l'événement Saisie 'niveau détail' OnSpinCtrlEnter
+	def m_ExtractNivDetailNumEvtEnter(self,event):
+		global gExtractNivDetailNum
+		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
+		print "gExtractNivDetailNum EvtEnter = " + str(gExtractNivDetailNum)
 
 	# capture de l'événement Sélection Cbo Evt 'Caractère séparateur'
 	def m_separateurCbxEvt(self,event):
@@ -404,7 +423,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				# arret clignotant ERR
 				erreurGbl = False
 				self.m_bmpRunStop.SetBitmap(self.imageLedStop)
-				self.m_RunStopTool.SetNormalBitmap(self.imagePause)
+				self.m_RunStopTool.SetNormalBitmap(screenHome.imagePause)
 			# le port COM est defini, on continue
 			else:
 				#initialisation et ouverture du port série
@@ -422,7 +441,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					erreurGbl = False
 					#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 					self.m_bmpRunStop.SetBitmap(self.imageLedStop)
-					self.m_RunStopTool.SetNormalBitmap(self.imagePause)
+					self.m_RunStopTool.SetNormalBitmap(screenHome.imagePlay)
+					self.m_toolBar1.Realize()
 				else:
 					# pas d'erreur, on continue:
 					erreurGbl = False
@@ -430,7 +450,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					# animation led run
 					#imageLedRun  = wx.Bitmap("LedRUN_ON.png",  wx.BITMAP_TYPE_ANY)
 					self.m_bmpRunStop.SetBitmap(self.imageLedRunOn)
-					self.m_RunStopTool.SetNormalBitmap(self.imagePlay)
+					self.m_RunStopTool.SetNormalBitmap(screenHome.imagePause)
+					self.m_toolBar1.Realize()
 					print('Port serie '+COMselectGbl+' ouvert.')
 					MsgLog(self,'Passage en RUN: Port serie '+COMselectGbl+' ouvert.')
 					# flag appli en run
@@ -453,7 +474,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		erreurGbl = False
 		#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 		self.m_bmpRunStop.SetBitmap(self.imageLedStop)
-		self.m_RunStopTool.SetNormalBitmap(self.imagePause)
+		self.m_RunStopTool.SetNormalBitmap(screenHome.imagePause)
+		self.m_toolBar1.Realize()
 		# STOP si port série déjà ouvert
 		if self.portSerie.isOpen(): 
 			# Arrêt de la scrutation réception série
@@ -477,9 +499,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					# Fermeture du port série
 					print('Passage en STOP: Port serie '+COMselectGbl+' ferme.')
 					MsgLog(self,'Port serie '+COMselectGbl+' ferme.')
-					#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 					self.m_bmpRunStop.SetBitmap(self.imageLedStop)
-					self.m_RunStopTool.SetNormalBitmap(self.imagePause)
+					self.m_RunStopTool.SetNormalBitmap(screenHome.imagePlay)
+					self.m_toolBar1.Realize()
 					global statusRunStopGbl
 					statusRunStopGbl = 0
 
@@ -526,7 +548,9 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					if data == '\r':
 						#sys.stdout.write('\n')
 						self.logTextCtrl.WriteText('\n')
-						MysqlInsert(self,"Uno", "1", gSerialLog)
+						# enregistrement SQL activé ?
+						if gDataToSQL:
+							MysqlInsert(self,"Uno", "1", gSerialLog)
 						gSerialLog = ""
 					else:
 						#sys.stdout.write(data)
@@ -660,7 +684,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.m_ExtractHorodateChk.SetValue(False)
 		self.m_ExtractCategorieChk.SetValue(False)
 		self.m_CategorieTxt.Value = ""
-		self.m_ExtractPrioriteChk.SetValue(False)
+		self.m_ExtractNivDetailChk.SetValue(False)
 		self.m_PrioriteInt.Value = 0
 		self.m_separateurCbx.SetValue("")
 		self.m_separateurCbx.Enable(False)
@@ -674,8 +698,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractHorodatageChk
 		global gExtractCategorieChk
 		global gExtractCategorieTxt
-		global gExtractPrioriteChk
-		global gExtractPrioriteInt
+		global gExtractNivDetailChk
+		global gExtractNivDetailNum
 		global gCaractereSeparateurTxt
 		print("Menu: Ouvrir Profile")
 		enableBlinkGbl = False
@@ -706,8 +730,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				gExtractHorodatageChk		= profile.getboolean('Decodage_Logs', 'Extract_Horodatage_Chk')
 				gExtractCategorieChk		= profile.getboolean('Decodage_Logs', 'Extract_Categorie_Chk')
 				gExtractCategorieTxt		= profile.get(       'Decodage_Logs', 'Extract_Categorie_Txt')
-				gExtractPrioriteChk			= profile.getboolean('Decodage_Logs', 'Extract_Priorite_Chk')
-				gExtractPrioriteInt			= profile.getint(    'Decodage_Logs', 'Extract_Priorite_Txt')
+				gExtractNivDetailChk			= profile.getboolean('Decodage_Logs', 'Extract_Priorite_Chk')
+				gExtractNivDetailNum			= profile.getint(    'Decodage_Logs', 'Extract_Priorite_Txt')
 				gCaractereSeparateurTxt		= profile.get(       'Decodage_Logs', 'Caractere_Separateur_Txt')
 				# test si le port série est bien sur la machine
 				try:
@@ -749,8 +773,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractHorodatageChk
 		global gExtractCategorieChk
 		global gExtractCategorieTxt
-		global gExtractPrioriteChk
-		global gExtractPrioriteInt
+		global gExtractNivDetailChk
+		global gExtractNivDetailNum
 		global gCaractereSeparateurTxt
 		print("Menu: Enregistrer Profile")
 		enableBlinkGbl = False
@@ -767,16 +791,16 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				profile.set('Decodage_Logs', 'Extract_Horodatage_Chk',		str(gExtractHorodatageChk))
 				profile.set('Decodage_Logs', 'Extract_Categorie_Chk',		str(gExtractCategorieChk))
 				profile.set('Decodage_Logs', 'Extract_Categorie_Txt',		gExtractCategorieTxt)
-				profile.set('Decodage_Logs', 'Extract_Priorite_Chk',		str(gExtractPrioriteChk))
-				profile.set('Decodage_Logs', 'Extract_Priorite_Txt',		str(gExtractPrioriteInt))
+				profile.set('Decodage_Logs', 'Extract_Priorite_Chk',		str(gExtractNivDetailChk))
+				profile.set('Decodage_Logs', 'Extract_Priorite_Txt',		str(gExtractNivDetailNum))
 				profile.set('Decodage_Logs', 'Caractere_Separateur_Txt',	gCaractereSeparateurTxt)
 				print("Dossier = " + self.profileFolderName)
 				print("Fichier = " + self.profileFileName)
 				print("gExtractHorodatageChk      = " + str(gExtractHorodatageChk))
 				print("gExtractCategorieChk       = " + str(gExtractCategorieChk))
 				print("gExtractCategorieTxt       = " + gExtractCategorieTxt)
-				print("gExtractPrioriteChk        = " + str(gExtractPrioriteChk))
-				print("gExtractPrioriteInt        = " + str(gExtractPrioriteInt))
+				print("gExtractNivDetailChk        = " + str(gExtractNivDetailChk))
+				print("gExtractNivDetailNum        = " + str(gExtractNivDetailNum))
 				print("gCaractereSeparateurTxt    = " + gCaractereSeparateurTxt)
 				MsgLog(self,'Enregistrer profile: '+os.path.join(self.profileFolderName, self.profileFileName))
 				profile.write(open(os.path.join(self.profileFolderName, self.profileFileName), 'w'))
@@ -977,6 +1001,46 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		else:
 			self.AppliStop()
 
+	# Icone <SQL on/off>
+	def m_dataToolEvt(self,event):
+		global gDataToSQL
+		if not gDataToSQL:
+			gDataToSQL = True
+			self.m_dataTool.SetNormalBitmap(screenHome.imageSQLon)
+			self.m_toolBar1.Realize()
+			#self.spacer_10x60.Show()
+			self.m_separateurTxt.Show()
+			self.m_separateurCbx.Show()
+			self.spacer_10x20_01.Show()
+			self.m_ExtractHorodateChk.Show()
+			self.spacer_10x20_02.Show()
+			self.m_ExtractCategorieChk.Show()
+			self.spacer_10x20_03.Show()
+			self.m_CategorieLbl.Show()
+			self.m_CategorieTxt.Show()
+			self.spacer_10x20_04.Show()
+			self.m_ExtractNivDetailChk.Show()
+			self.m_ExtractNivDetailLbl.Show()
+			self.m_ExtractNivDetailNum.Show()
+		else:
+			gDataToSQL = False
+			self.m_dataTool.SetNormalBitmap(screenHome.imageSQLoff)
+			self.m_toolBar1.Realize()
+			#self.spacer_10x60.Hide()
+			self.m_separateurTxt.Hide()
+			self.m_separateurCbx.Hide()
+			self.spacer_10x20_01.Hide()
+			self.m_ExtractHorodateChk.Hide()
+			self.spacer_10x20_02.Hide()
+			self.m_ExtractCategorieChk.Hide()
+			self.spacer_10x20_03.Hide()
+			self.m_CategorieLbl.Hide()
+			self.m_CategorieTxt.Hide()
+			self.spacer_10x20_04.Hide()
+			self.m_ExtractNivDetailChk.Hide()
+			self.m_ExtractNivDetailLbl.Hide()
+			self.m_ExtractNivDetailNum.Hide()
+
 	# Icone <Quiter>
 	def m_toolQuiterEvt(self,event):
 		global COMselectGbl
@@ -1144,8 +1208,8 @@ def Save(self, folderName, fileName):
 def SeparateurEnable(self):
 	global gExtractHorodatageChk
 	global gExtractCategorieChk
-	global gExtractPrioriteChk
-	if gExtractHorodatageChk or gExtractCategorieChk or gExtractPrioriteChk:
+	global gExtractNivDetailChk
+	if gExtractHorodatageChk or gExtractCategorieChk or gExtractNivDetailChk:
 		gCaractereSeparateurEnable = True		# update image variable globale
 		# Activation comboBox 'Caractère séparateur'
 		self.m_separateurCbx.Enable(True)
@@ -1153,7 +1217,7 @@ def SeparateurEnable(self):
 		gCaractereSeparateurEnable = False		# update image variable globale
 		# Désactivation comboBox 'Caractère séparateur'
 		self.m_separateurCbx.Enable(False)
-	#print "m_ExtractPrioriteChkEvt ",gExtractPrioriteChk
+	#print "m_ExtractNivDetailChkEvt ",gExtractNivDetailChk
 
 #####################################################
 # 					Fonction DecodageRefresh(self)
@@ -1167,21 +1231,21 @@ def DecodageRefresh(self):
 	global gExtractHorodatageChk
 	global gExtractCategorieChk
 	global gExtractCategorieTxt
-	global gExtractPrioriteChk
-	global gExtractPrioriteInt
+	global gExtractNivDetailChk
+	global gExtractNivDetailNum
 	global gCaractereSeparateurTxt
 	global gCaractereSeparateurEnable
 	print('gExtractHorodatageChk=      ' + str(gExtractHorodatageChk))
 	print('gExtractCategorieChk=       ' + str(gExtractCategorieChk))
 	print('gExtractCategorieTxt=       ' + gExtractCategorieTxt)
-	print('gExtractPrioriteChk=        ' + str(gExtractPrioriteChk))
-	print('gExtractPrioriteInt=        ' + str(gExtractPrioriteInt))
+	print('gExtractNivDetailChk=        ' + str(gExtractNivDetailChk))
+	print('gExtractNivDetailNum=        ' + str(gExtractNivDetailNum))
 	print('gCaractereSeparateurTxt=    ' + gCaractereSeparateurTxt)
 	self.m_ExtractHorodateChk.SetValue(gExtractHorodatageChk)
 	self.m_ExtractCategorieChk.SetValue(gExtractCategorieChk)
 	self.m_CategorieTxt.Value = gExtractCategorieTxt
-	self.m_ExtractPrioriteChk.SetValue(gExtractPrioriteChk)
-	self.m_PrioriteInt.Value = gExtractPrioriteInt
+	self.m_ExtractNivDetailChk.SetValue(gExtractNivDetailChk)
+	self.m_PrioriteInt.Value = gExtractNivDetailNum
 	self.m_separateurCbx.SetValue(gCaractereSeparateurTxt)
 	self.m_separateurCbx.Enable(gCaractereSeparateurEnable)
 	SeparateurEnable(self)
@@ -1195,6 +1259,9 @@ def DecodageRefresh(self):
 # 2014-09-23:	Création
 #####################################################
 def MysqlInsert(self,categorie,niv_detail,message):
+	gExtractHorodatageChkRang = 0
+	gExtractCategorieChkRang  = 0
+	gExtractNivDetailChkRang  = 0
 	try:
 		#MysqlInsert: print "base MySQL ouverture..."
 		db = MySQLdb.connect(host="192.168.1.150",user="root",passwd="mysql",db="serial_sql_logger")
@@ -1204,25 +1271,77 @@ def MysqlInsert(self,categorie,niv_detail,message):
 		reponse=boxErr.ShowModal()
 		boxErr.Destroy()
 	else:
-		#print "MysqlInsert: base MySQL ouverte"
-		cur = db.cursor() 
-		dateTime= (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:00"))
-		requete=        "INSERT INTO arduino (horodatage,categorie,niv_detail,message) "
-		requete=requete+"VALUES ('"+dateTime+"','"+categorie+"','"+niv_detail+"','"+message+"')"
+		# séparation des données ?
+		# oui: au moins une extraction
+		if gExtractHorodatageChk or gExtractCategorieChk or gExtractNivDetailChk:
+			messageSplit = message.split(gCaractereSeparateurTxt)
+			print"====================================="
+			print  messageSplit 
+			#====  horodatage inclus dans message ?
+			# oui: horodatage inclus dans message donc on l'extrait
+			if gExtractHorodatageChk:
+				gExtractHorodatageChkRang = 1
+				dateTimeSQL  = messageSplit[gExtractHorodatageChkRang -1]
+			# non: horodatage pas dans message donc on le cré
+			else:
+				gExtractHorodatageChkRang = 0
+				dateTimeSQL  = (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:00"))
+			#==== catégorie inclus dans message ?
+			# oui: catégorie inclus dans message donc on l'extrait
+			if gExtractCategorieChk:
+				gExtractCategorieChkRang = 1
+				categorieSQL   = messageSplit[gExtractHorodatageChkRang + gExtractCategorieChkRang -1]
+			# non: catégorie pas dans message donc on le cré avec la saisie
+			else:
+				gExtractCategorieChkRang = 0
+				categorieSQL   = gExtractCategorieTxt
+			#==== niveau detail inclus dans message ?
+			# oui: niveau detail inclus dans message donc on l'extrait
+			if gExtractNivDetailChk:
+				gExtractNivDetailChkRang = 1
+				niv_detailSQL   = messageSplit[gExtractHorodatageChkRang + gExtractCategorieChkRang + gExtractNivDetailChkRang -1]
+			# non: niveau detail pas dans message donc on le cré avec la saisie
+			else:
+				gExtractNivDetailChkRang = 0	
+				niv_detailSQL   = gExtractNivDetailNum
+			messageSQL = messageSplit[gExtractHorodatageChkRang + gExtractCategorieChkRang + gExtractNivDetailChkRang]
+		# non: pas d'extraction
+		else:
+			# date heure système +catégorie saisie +niveau détail saisie +message brut
+			dateTimeSQL  = (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:00"))
+			categorieSQL = gExtractCategorieTxt
+			niv_detailSQL= gExtractNivDetailNum
+			messageSQL   = message
+		# composition de la requete SQL
+		print "== composition requete =="
+		#print "dateTimeSQL  : " + dateTimeSQL
+		#print "categorieSQL : " + categorieSQL
+		#print "niv_detailSQL: " + niv_detailSQL
+		#print "messageSQL   : " + messageSQL
+		requeteHeader = "INSERT INTO arduino (horodatage,categorie,niv_detail,message) "
 		try:
+			requeteSQL = requeteHeader + "VALUES ('"+dateTimeSQL+"','"+categorieSQL+"','"+str(niv_detailSQL)+"','"+messageSQL+"')"
+		except Exception:
+			print "MysqlInsert: Erreur avec la composition Requete"
+		else:
+			print "MysqlInsert: Pas d erreur avec la composition Requete"
+		# tentative d'execussion de la requete
+		try:
+			#print "MysqlInsert: base MySQL ouverte"
+			cur = db.cursor() 
 			# execute la requete
-			cur.execute(requete)
-			#print "MysqlInsert: ...Mise a jour de la base"
+			cur.execute(requeteSQL)
+			print "MysqlInsert: ...Mise a jour de la base"
 			db.commit()
 		except Exception:
 			print "MysqlInsert: Erreur avec la Requete= " + requete
 			print "MysqlInsert: ...Retour etat precedant de la base"
 			db.rollback()
 		else:
-			#print "MysqlInsert: Requete executee avec:"
-			#print requete
+			print "MysqlInsert: Requete executee avec:"
+			print requeteSQL
 			db.close()
-			#print "MysqlInsert: base fermee"
+			print "MysqlInsert: base fermee"
 			print "MysqlInsert: ok"
 
 
@@ -1271,12 +1390,14 @@ ProfileNameGbl	= "Aucun"
 COMselectGbl  	= "Non select."
 COMvitesseGbl 	= 115200
 statusRunStopGbl= 0
+gDataToSQL		= 0
+
 gSerialLog      = ""
 gExtractHorodatageChk	  = False
 gExtractCategorieChk	  = False
 gExtractCategorieTxt	  = ""
-gExtractPrioriteChk		  = False
-gExtractPrioriteInt		  = 1
+gExtractNivDetailChk		  = False
+gExtractNivDetailNum		  = 1
 gCaractereSeparateurTxt	  = ""
 gCaractereSeparateurEnable= False
 

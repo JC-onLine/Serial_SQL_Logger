@@ -1,0 +1,10 @@
+header	1d2734
+onglet	404040
+corp	161616
+saisie	262626
+liseret	4b4b4b
+texte	cfcfcf
+user	55a5c4
+bouton	2c2c2c
+asc bg	575757
+asc tri	afadad
