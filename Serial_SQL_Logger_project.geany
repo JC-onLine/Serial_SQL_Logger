@@ -17,12 +17,25 @@ indent_mode=2
 name=Serial_SQL_Logger_project
 base_path=C:\\12_wxFormBuilder\\Serial_SQL_Logger
 description=
+file_patterns=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=80
 
 [files]
-current_page=0
-FILE_NAME_0=4716;Python;0;EUTF-8;1;1;0;C%3A%5C12_wxFormBuilder%5CSerial_SQL_Logger%5CSerial_SQL_Logger_MAIN.py;0;4
-FILE_NAME_1=8130;Python;0;EUTF-8;1;1;0;C%3A%5C12_wxFormBuilder%5CSerial_SQL_Logger%5CSerial_SQL_Logger_GUI.py;0;4
+current_page=4
+FILE_NAME_0=5106;Python;0;EUTF-8;1;1;0;C%3A%5C12_wxFormBuilder%5CSerial_SQL_Logger%5CSerial_SQL_Logger_MAIN.py;0;4
+FILE_NAME_1=11789;PHP;0;EUTF-8;1;1;0;D%3A%5Cwamp%5Cwww%5CSerial_SQL_Logger%5Cserial_sql_logger.php;0;4
+FILE_NAME_2=1629;PHP;0;EUTF-8;1;1;0;D%3A%5Cwamp%5Cwww%5CSerial_SQL_Logger%5Cphp%5Csetting.php;0;4
+FILE_NAME_3=749;CSS;0;EUTF-8;1;1;0;D%3A%5Cwamp%5Cwww%5CSerial_SQL_Logger%5Ccss%5Cstyle_custom.css;0;4
+FILE_NAME_4=258;PHP;0;EUTF-8;1;1;0;D%3A%5Cwamp%5Cwww%5Cindex.php;0;4
+
+[build-menu]
+C++FT_00_LB=_Compiler
+C++FT_00_CM=g++ -Wall -c "%f" -std=c++11
+C++FT_00_WD=
+C++FT_01_LB=_Construire
+C++FT_01_CM=g++ -Wall -o "%e" "%f" -std=c++11
+C++FT_01_WD=
+filetypes=C++;

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
+# -*- coding: utf8 -*-
 
 #####################################################################################
 #
@@ -81,6 +80,13 @@
 #				Ajout icone SQL on/off
 # 2015-02-08	Remplacement de l'animation loader
 # 2015-02-08	Mise en place sélection extraction Horodatage/Catégorie/NivDétail/MessageLog
+# 2015-02-12	Ajout gestion utf-8
+# 2015-02-14	PHP: Correction utf8 coté PHP MySQL -> merci WOoOinux !
+#					 $cnx->exec("set names utf8");
+# 2015-02-15	Correction de toutes les chaines caractères en utf-8. ex: u'texte'
+# 2015-02-16:	PHP: Ajout filtre catégorie: Toutes+Aucune+séparateur
+# 2015-02-17:	PHP: Suppression format bootstrap du tableau. retour custom
+# 2015-02-18:	PHP: Ajout du marqueur de ligne
 #
 #####################################################################################
 # TODO:
@@ -101,6 +107,7 @@
 #		[ ] Ajouter dossier 'Logs' pour enregistrement des Logs provenant port série
 #####################################################################################
 
+from __future__ import unicode_literals
 # importation la librairie wxWidget
 import wx
 # importation de la partie GUI
@@ -217,12 +224,12 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		if (g_OSname == 'Linux'):
 			self.m_bmpOS.SetBitmap(self.imageOsLinux)
 			self.m_OSdetailsTxt.SetLabel(g_OSdistrib)
-			MsgLog(self, "Systeme d'exploitation: " + g_OSname+'  '+g_OSdistrib+'  '+g_architectBits)
+			MsgLog(self, u"Systeme d'exploitation: " + g_OSname+'  '+g_OSdistrib+'  '+g_architectBits)
 			self.m_gestPeriphMnu.Enable(False)
 		else:
 			self.m_bmpOS.SetBitmap(self.imageOsWindows)
 			self.m_OSdetailsTxt.SetLabel(g_OSname+' '+g_OSversion)
-			MsgLog(self, "Systeme d'exploitation: " + g_OSname+'  '+g_OSversion+'  '+g_architectBits)
+			MsgLog(self, u"Systeme d'exploitation: " + g_OSname+'  '+g_OSversion+'  '+g_architectBits)
 		self.m_ArchBitsTxt.SetLabel(g_architectBits)
 		# ListBox Caractères séparateurs de données
 		self.m_separateurCbx.Clear()
@@ -318,7 +325,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			gExtractHorodatageChk = True
 		else:
 			gExtractHorodatageChk = False
-		print "gExtractHorodatageChk = " + str(gExtractHorodatageChk)
+		print u"gExtractHorodatageChk = " + str(gExtractHorodatageChk)
 		SeparateurEnable(self)
 
 	# capture de l'événement click checkBox 'Extraction Catégorie'
@@ -335,19 +342,19 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			#Activation saisie txt 'catégorie'
 			#pour saisir manuellement la catégorie pour SQL
 			self.m_CategorieTxt.Enable(True)
-		print "gExtractCategorieChk = " + str(gExtractCategorieChk)
+		print u"gExtractCategorieChk = " + str(gExtractCategorieChk)
 		SeparateurEnable(self)
 
 	# capture de l'événement Saisie Text 'Catégorie'
 	def m_CategorieTxtEvt(self,event):
 		global gExtractCategorieTxt
 		gExtractCategorieTxt = self.m_CategorieTxt.GetValue()
-		print "m_CategorieTxtEvt: " + gExtractCategorieTxt
+		print u"m_CategorieTxtEvt: " + gExtractCategorieTxt
 	# capture de l'événement Saisie Text 'Catégorie'
 	def m_CategorieTxtTextEnter(self,event):
 		global gExtractCategorieTxt
 		gExtractCategorieTxt = self.m_CategorieTxt.GetValue()
-		print "m_CategorieTxtTextEnter: " + gExtractCategorieTxt
+		print u"m_CategorieTxtTextEnter: " + gExtractCategorieTxt
 
 	# capture de l'événement click checkBox 'Extraction Priorité'
 	def m_ExtractNivDetailChkEvt(self,event):
@@ -363,40 +370,40 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			#Activation saisie txt 'Priorité'
 			#pour saisir manuellement la  Priorité pour SQL
 			self.m_ExtractNivDetailNum.Enable(True)
-		print "gExtractNivDetailChk = " + str(gExtractNivDetailChk)
+		print u"gExtractNivDetailChk = " + str(gExtractNivDetailChk)
 		SeparateurEnable(self)
 
 	# capture de l'événement Saisie 'niveau détail' OnSpinCtrl
 	def m_ExtractNivDetailNumEvt(self,event):
 		global gExtractNivDetailNum
 		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
-		print "gExtractNivDetailNum Evt = " + str(gExtractNivDetailNum)
+		print u"gExtractNivDetailNum Evt = " + str(gExtractNivDetailNum)
 	# capture de l'événement Saisie 'niveau détail' OnSpinCtrlText
 	def m_ExtractNivDetailNumEvtTxt(self,event):
 		global gExtractNivDetailNum
 		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
-		print "gExtractNivDetailNum EvtTxt = " + str(gExtractNivDetailNum)
+		print u"gExtractNivDetailNum EvtTxt = " + str(gExtractNivDetailNum)
 	# capture de l'événement Saisie 'niveau détail' OnSpinCtrlEnter
 	def m_ExtractNivDetailNumEvtEnter(self,event):
 		global gExtractNivDetailNum
 		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
-		print "gExtractNivDetailNum EvtEnter = " + str(gExtractNivDetailNum)
+		print u"gExtractNivDetailNum EvtEnter = " + str(gExtractNivDetailNum)
 
 	# capture de l'événement Sélection Cbo Evt 'Caractère séparateur'
 	def m_separateurCbxEvt(self,event):
 		global gCaractereSeparateurTxt
 		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
-		print("gCaractereSeparateurTxt Evt = " + gCaractereSeparateurTxt)
+		print(u"gCaractereSeparateurTxt Evt = " + gCaractereSeparateurTxt)
 	# capture de l'événement Sélection Cbo OnText 'Caractère séparateur'
 	def m_separateurCbxOnText(self,event):
 		global gCaractereSeparateurTxt
 		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
-		print("gCaractereSeparateurTxt OnText= " + gCaractereSeparateurTxt)
+		print(u"gCaractereSeparateurTxt OnText= " + gCaractereSeparateurTxt)
 	# capture de l'événement Sélection Cbo OnTextEnter 'Caractère séparateur'
 	def m_separateurCbxOnTextEnter(self,event):
 		global gCaractereSeparateurTxt
 		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
-		print("gCaractereSeparateurTxt OnTextEnter = " + gCaractereSeparateurTxt)
+		print(u"gCaractereSeparateurTxt OnTextEnter = " + gCaractereSeparateurTxt)
 
 	#####################################################
 	# 					Fonction Appli_start(self)
@@ -409,15 +416,15 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		global COMvitesseGbl
 		global erreurGbl
-		print("Capture evenement bouton RUN")
+		print(u"Capture evenement bouton RUN")
 		# START si port série déjà pas ouvert
 		if not self.portSerie.isOpen(): 
 			# test si variable COMselectGbl pas definie
 			if COMselectGbl == "Non select.":
-				print('Port serie non selectionne')
-				MsgLog(self,'Erreur: Port serie non selectionne')
+				print(u'Port serie non selectionne')
+				MsgLog(self,u'Erreur: Port serie non selectionne')
 				erreurGbl = True
-				boxErr = wx.MessageDialog(None,'Port serie non selectionne', 'Erreur:', wx.OK)
+				boxErr = wx.MessageDialog(None,u'Port série non selectionne', 'Erreur:', wx.OK)
 				reponse= boxErr.ShowModal()
 				boxErr.Destroy()
 				# arret clignotant ERR
@@ -430,8 +437,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				try:
 					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
 				except Exception:
-					print('Erreur avec le port serie '+COMselectGbl)
-					MsgLog(self,'Erreur avec le port serie '+COMselectGbl)
+					print(u'Erreur avec le port serie '+COMselectGbl)
+					MsgLog(self,u'Erreur avec le port serie '+COMselectGbl)
 					erreurGbl = True
 					# appel popup erreur COM
 					boxErr = wx.MessageDialog(None,'Erreur avec le port serie '+COMselectGbl, 'Erreur:', wx.OK)
@@ -452,8 +459,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					self.m_bmpRunStop.SetBitmap(self.imageLedRunOn)
 					self.m_RunStopTool.SetNormalBitmap(screenHome.imagePause)
 					self.m_toolBar1.Realize()
-					print('Port serie '+COMselectGbl+' ouvert.')
-					MsgLog(self,'Passage en RUN: Port serie '+COMselectGbl+' ouvert.')
+					print(u'Port série '+COMselectGbl+ u' ouvert.')
+					MsgLog(self,u'Passage en RUN: Port serie '+COMselectGbl+ u' ouvert.')
 					# flag appli en run
 					global statusRunStopGbl
 					statusRunStopGbl = 1
@@ -470,7 +477,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def AppliStop(self):
 		global COMselectGbl
 		global erreurGbl
-		print("Capture evenement bouton STOP")
+		print(u"Capture evenement bouton STOP")
 		erreurGbl = False
 		#imageLedStop = wx.Bitmap("LedSTOP.png", wx.BITMAP_TYPE_ANY)
 		self.m_bmpRunStop.SetBitmap(self.imageLedStop)
@@ -480,25 +487,25 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		if self.portSerie.isOpen(): 
 			# Arrêt de la scrutation réception série
 			if self.alive and self._reader_alive:
-				print('Arret de la scrutation reception serie.')
-				MsgLog(self, 'Arret de la scrutation reception serie ' + COMselectGbl)
+				print(u'Arrêt de la scrutation réception série.')
+				MsgLog(self, u'Arret de la scrutation reception serie ' + COMselectGbl)
 				self._stop_reader()
 				#Fermeture du port série
 				try:
 					self.portSerie.close()
 				except NameError:
-					print('Erreur a la fermeture du Port serie '+COMselectGbl)
-					MsgLog(self,'Erreur a la fermeture du Port serie '+COMselectGbl)
+					print(u'Erreur a la fermeture du Port série '+COMselectGbl)
+					MsgLog(self, u'Erreur a la fermeture du Port serie '+COMselectGbl)
 					erreurGbl = True
-					boxErr = wx.MessageDialog(None,'Erreur a la fermeture du Port serie '+COMselectGbl, 'Erreur:', wx.OK)
+					boxErr = wx.MessageDialog(None,u'Erreur à la fermeture du Port série '+COMselectGbl, 'Erreur:', wx.OK)
 					reponse=boxErr.ShowModal()
 					boxErr.Destroy()
 				else:
 					# pas d'erreur, on continue:
 					erreurGbl = False
 					# Fermeture du port série
-					print('Passage en STOP: Port serie '+COMselectGbl+' ferme.')
-					MsgLog(self,'Port serie '+COMselectGbl+' ferme.')
+					print(u'Passage en STOP: Port série '+COMselectGbl+u' fermé.')
+					MsgLog(self, u'Port serie '+COMselectGbl+ u' ferme.')
 					self.m_bmpRunStop.SetBitmap(self.imageLedStop)
 					self.m_RunStopTool.SetNormalBitmap(screenHome.imagePlay)
 					self.m_toolBar1.Realize()
@@ -529,29 +536,34 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# Lecture du port Série			
 	def reader(self):
 		# la liste texte est: logTextCtrl.Value = ""
-		"""loop and copy serial->console"""
 		try:
 			global gSerialLog
 			while self.alive and self._reader_alive:
 				#desactive le RUN/STOP clignotant pour optimiser la réception
 				enableBlinkGbl = False
-				#data = character(self.serial.read(1))
+				# lecture du port série
 				data = self.portSerie.read(1)
+				if ((data == "'") or (data == '"')):
+					data = ""
+				# conversion décodage cp1252 (windows)
+				data = data.decode('latin_1', errors='replace')
 				if self.repr_mode == 9:
-					# direct output, just have to care about newline setting
-#					gSerialLog = gSerialLog + data
 					self.logTextCtrl.WriteText(data)
 				elif self.repr_mode == 0:
 					# direct output, just have to care about newline setting
-#					if data == '\r' and self.convert_outgoing == CONVERT_CR:
+	#					if data == '\r' and self.convert_outgoing == CONVERT_CR:
 					# si reception CR
 					if data == '\r':
 						#sys.stdout.write('\n')
-						self.logTextCtrl.WriteText('\n')
+	#####					self.logTextCtrl.WriteText('\n')
 						# enregistrement SQL activé ?
 						if gDataToSQL:
-							MysqlInsert(self,"Uno", "1", gSerialLog)
-						gSerialLog = ""
+							# encodage utf-8 (pas windows, mais le reste du monde)
+							dataTmp = data.encode('utf_8', errors='replace')
+							gSerialLog = gSerialLog + dataTmp
+							# enregistrement données reçu du port série en SQL
+							MysqlInsert(self,"bacacier07ligne01", "1", gSerialLog)
+							gSerialLog = ""
 					else:
 						#sys.stdout.write(data)
 						self.logTextCtrl.WriteText(data)
@@ -589,8 +601,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	######## MENU [Fichier] ########
 	# capture de l'événement selection menu <LogNew>
 	def m_LogNewMnuEvt(self,event):
-		print("Menu: Nouveau: Effacement des Logs")
-		MsgLog(self,'Fichier Nouveau: Effacement des Logs')
+		print(u"Menu: Nouveau: Effacement des Logs")
+		MsgLog(self, u'Fichier Nouveau: Effacement des Logs')
 		self.logTextCtrl.Value = ""
 	# capture de l'événement selection menu <LogOpen>
 	def m_LogOpenMnuEvt(self,event):
@@ -598,7 +610,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global logFileName
 		global logFolderName
 		global enableBlinkGbl
-		print("Menu: Ouvrir Log")
+		print(u"Menu: Ouvrir Log")
 		enableBlinkGbl = False
 		# construction du chemin des Logs
 #		logFolderName = os.path.join(appliFolderName, "Logs")
@@ -615,10 +627,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				pointeurFichier = file(os.path.join(self.logFolderName, self.logFileName), 'r')
 				self.logTextCtrl.SetValue(pointeurFichier.read())
 				pointeurFichier.close()
-				MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.logFolderName, self.logFileName) + ' ouverture ok')
+				MsgLog(self, u'Fichier Ouvrir: ' + os.path.join(self.logFolderName, self.logFileName) + u' ouverture ok')
 			except:
-				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
-				print('Erreur lecture du fichier: '+self.logFileName)
+				MsgLog(self, u'Erreur lecture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+				print(u'Erreur lecture du fichier: '+self.logFileName)
 				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+self.logFileName, 'Erreur lecture fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
@@ -628,7 +640,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# capture de l'événement selection menu <LogSave>
 	def m_LogSaveMnuEvt(self,event):
 		global enableBlinkGbl
-		print("Menu: Enregistrer Logs")
+		print(u"Menu: Enregistrer Logs")
 		enableBlinkGbl = False
 		# enregistre si fichier/dossier ont un nom
 		if (self.logFileName !="") and (self.logFolderName != ""):
@@ -636,25 +648,25 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				# accès fichier en écriture
 				pointeurFichier = file(os.path.join(self.logFolderName, self.logFileName), 'w')
 				pointeurFichier.write(self.logTextCtrl.GetValue())
-				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+				MsgLog(self, u'Fichier Enregistrer: ' + os.path.join(self.logFolderName, self.logFileName) + u' Sauvegarde ok')
 				return True
 			except:
-				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
-				print('Erreur ecriture du fichier: '+self.logFileName)
+				MsgLog(self, u'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+				print(u'Erreur écriture du fichier: '+self.logFileName)
 				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 				return False
 		# sinon popup <Enregistrer sous...>
 		else:
-			print('Fichier sans nom: go <Enregistrer sous...> ')
+			print(u'Fichier sans nom: go <Enregistrer sous...> ')
 			self.m_LogSaveAsMnuEvt(self)
 		enableBlinkGbl = True
 		
 	# capture de l'événement selection menu <LogSaveAs...>
 	def m_LogSaveAsMnuEvt(self,event):
 		global enableBlinkGbl
-		print("Menu: Enregistrer Logs sous...")
+		print(u"Menu: Enregistrer Logs sous...")
 		enableBlinkGbl = False
 		popupSaveAs = wx.FileDialog(self, "Enregister fichier log sous...", self.logFolderName, self.logFileName,
 						"Fichier texte (*.txt)|*.txt|All Files|*.*", wx.SAVE)
@@ -664,8 +676,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			# on réutilise la fonction d'enregistrement
 			if self.m_LogSaveMnuEvt(self):
 				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.logFileName+ "]")
-				print("Serial SQL Logger - [" + self.logFileName + "]")
-				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.logFolderName, self.logFileName) + ' Sauvegarde ok')
+				print(u"Serial SQL Logger - [" + self.logFileName + "]")
+				MsgLog(self, u'Fichier Enregistrer sous: ' + os.path.join(self.logFolderName, self.logFileName) + u' Sauvegarde ok')
 		enableBlinkGbl = True
 
 	# capture de l'événement selection menu <ProfileNew>
@@ -701,20 +713,20 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractNivDetailChk
 		global gExtractNivDetailNum
 		global gCaractereSeparateurTxt
-		print("Menu: Ouvrir Profile")
+		print(u"Menu: Ouvrir Profile")
 		enableBlinkGbl = False
 		popupOpen = wx.FileDialog(self, "Ouvrir fichier profile", self.profileFolderName, self.profileFileName,
 										"Fichier profile (*.cfg)|*.cfg|All Files|*.*", wx.OPEN)
 		if (popupOpen.ShowModal() == wx.ID_OK):
 			self.profileFileName   = popupOpen.GetFilename()
 			self.profileFolderName = popupOpen.GetDirectory()
-			print('popupOpen: '+self.profileFolderName+' '+self.profileFileName)
+			print(u'popupOpen: '+self.profileFolderName+' '+self.profileFileName)
 			try:
 				# accès fichier en lecture
 				pointeurFichierProfile = file(os.path.join(self.profileFolderName, self.profileFileName), 'r')
 			except Exception:
-				MsgLog(self,'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
-				print('Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				MsgLog(self, u'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				print(u'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
 				boxErr = wx.MessageDialog(None,'Erreur lecture du fichier: '+ os.path.join(self.profileFolderName,
 										  self.profileFileName), 'Erreur lecture fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
@@ -730,15 +742,15 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				gExtractHorodatageChk		= profile.getboolean('Decodage_Logs', 'Extract_Horodatage_Chk')
 				gExtractCategorieChk		= profile.getboolean('Decodage_Logs', 'Extract_Categorie_Chk')
 				gExtractCategorieTxt		= profile.get(       'Decodage_Logs', 'Extract_Categorie_Txt')
-				gExtractNivDetailChk			= profile.getboolean('Decodage_Logs', 'Extract_Priorite_Chk')
-				gExtractNivDetailNum			= profile.getint(    'Decodage_Logs', 'Extract_Priorite_Txt')
+				gExtractNivDetailChk		= profile.getboolean('Decodage_Logs', 'Extract_Priorite_Chk')
+				gExtractNivDetailNum		= profile.getint(    'Decodage_Logs', 'Extract_Priorite_Txt')
 				gCaractereSeparateurTxt		= profile.get(       'Decodage_Logs', 'Caractere_Separateur_Txt')
 				# test si le port série est bien sur la machine
 				try:
 					self.portSerie = serial.Serial(str(COMselectGbl),int(COMvitesseGbl))
 				except Exception:
-					print("Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine")
-					MsgLog(self,"Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine")
+					print(u"Erreur: le port série "+COMselectGbl+ u" n'est pas sur cette machine")
+					MsgLog(self, u"Erreur: le port serie "+COMselectGbl+ u" n'est pas sur cette machine")
 					erreurGbl = True
 					boxErr = wx.MessageDialog(None,"Erreur: le port serie "+COMselectGbl+" n'est pas sur cette machine", 'Erreur:', wx.OK)
 					reponse=boxErr.ShowModal()
@@ -750,7 +762,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					CheckVitesse(COMvitesseGbl)		# coche la vitesse
 					self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 					self.m_statusActionTextStat.SetLabel("Pret.")
-					MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse Port: "+ str(COMvitesseGbl))
+					MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse Port: "+ str(COMvitesseGbl))
 					self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 					# memorisation du profile pour titre appli
 					ProfileNameGbl = self.profileFileName
@@ -759,7 +771,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					# fermeture du fichier profile
 					pointeurFichierProfile.close()
 					DecodageRefresh(self)
-					MsgLog(self,'Fichier Ouvrir: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' ouverture ok')
+					MsgLog(self, u'Fichier Ouvrir: ' + os.path.join(self.profileFolderName, self.profileFileName) + u' ouverture ok')
 			popupOpen.Destroy()
 			enableBlinkGbl = True
 			AppliTitreCreation()
@@ -776,7 +788,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractNivDetailChk
 		global gExtractNivDetailNum
 		global gCaractereSeparateurTxt
-		print("Menu: Enregistrer Profile")
+		print(u"Menu: Enregistrer Profile")
 		enableBlinkGbl = False
 		# enregistre si fichier/dossier ont un nom
 		if (self.profileFileName !="") and (self.profileFolderName != ""):
@@ -794,28 +806,28 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 				profile.set('Decodage_Logs', 'Extract_Priorite_Chk',		str(gExtractNivDetailChk))
 				profile.set('Decodage_Logs', 'Extract_Priorite_Txt',		str(gExtractNivDetailNum))
 				profile.set('Decodage_Logs', 'Caractere_Separateur_Txt',	gCaractereSeparateurTxt)
-				print("Dossier = " + self.profileFolderName)
-				print("Fichier = " + self.profileFileName)
-				print("gExtractHorodatageChk      = " + str(gExtractHorodatageChk))
-				print("gExtractCategorieChk       = " + str(gExtractCategorieChk))
-				print("gExtractCategorieTxt       = " + gExtractCategorieTxt)
-				print("gExtractNivDetailChk        = " + str(gExtractNivDetailChk))
-				print("gExtractNivDetailNum        = " + str(gExtractNivDetailNum))
-				print("gCaractereSeparateurTxt    = " + gCaractereSeparateurTxt)
-				MsgLog(self,'Enregistrer profile: '+os.path.join(self.profileFolderName, self.profileFileName))
+				print(u"Dossier = " + self.profileFolderName)
+				print(u"Fichier = " + self.profileFileName)
+				print(u"gExtractHorodatageChk      = " + str(gExtractHorodatageChk))
+				print(u"gExtractCategorieChk       = " + str(gExtractCategorieChk))
+				print(u"gExtractCategorieTxt       = " + gExtractCategorieTxt)
+				print(u"gExtractNivDetailChk        = " + str(gExtractNivDetailChk))
+				print(u"gExtractNivDetailNum        = " + str(gExtractNivDetailNum))
+				print(u"gCaractereSeparateurTxt    = " + gCaractereSeparateurTxt)
+				MsgLog(self, u'Enregistrer profile: '+os.path.join(self.profileFolderName, self.profileFileName))
 				profile.write(open(os.path.join(self.profileFolderName, self.profileFileName), 'w'))
-				MsgLog(self,'Fichier Enregistrer: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' Sauvegarde ok')
+				MsgLog(self, u'Fichier Enregistrer: ' + os.path.join(self.profileFolderName, self.profileFileName) + u' Sauvegarde ok')
 				return True
 			except:
-				MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
-				print('Erreur ecriture du fichier: '+self.profileFileName)
+				MsgLog(self, u'Erreur ecriture du fichier: '+ os.path.join(self.profileFolderName, self.profileFileName))
+				print(u'Erreur écriture du fichier: '+self.profileFileName)
 				boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.profileFileName, 'Erreur enregistrement fichier:', wx.OK)
 				reponse=boxErr.ShowModal()
 				boxErr.Destroy()
 				return False
 		# sinon popup <Enregistrer sous...>
 		else:
-			print('Fichier sans nom: go <Enregistrer Profile sous...> ')
+			print(u'Fichier sans nom: go <Enregistrer Profile sous...> ')
 			self.m_ProfileSaveAsMnuEvt(self)
 		enableBlinkGbl = True
 		
@@ -825,7 +837,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global AppliTitreGbl
 		global ProfileNameGbl
 		global enableBlinkGbl
-		print("Menu: Enregistrer Profile sous...")
+		print(u"Menu: Enregistrer Profile sous...")
 		enableBlinkGbl = False
 		popupSaveAs = wx.FileDialog(self, "Enregister fichier profile sous...", self.profileFolderName, self.profileFileName,
 						"Fichier profile (*.cfg)|*.cfg|All Files|*.*", wx.SAVE)
@@ -835,8 +847,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			# on réutilise la fonction d'enregistrement
 			if self.m_ProfileSaveMnuEvt(self):
 				#self.FenetrePrincipaleClass.SetTitle(self.APP_NAME + " - [" +self.profileFileName+ "]")
-				print("Serial SQL Logger - [" + self.profileFileName + "]")
-				MsgLog(self,'Fichier Enregistrer sous: ' + os.path.join(self.profileFolderName, self.profileFileName) + ' Sauvegarde ok')
+				print(u"Serial SQL Logger - [" + self.profileFileName + "]")
+				MsgLog(self, u'Fichier Enregistrer sous: ' + os.path.join(self.profileFolderName, self.profileFileName) + u' Sauvegarde ok')
 				# memorisation du profile
 				ProfileNameGbl = self.profileFileName
 		enableBlinkGbl = True
@@ -845,13 +857,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 
 	# capture de l'événement selection menu <Quiter>
 	def m_quiterMnuEvt(self,event):
-		print("Menu: Quiter")
-		MsgLog(self,'Menu: Quiter')
+		print(u"Menu: Quiter")
+		MsgLog(self, u'Menu: Quiter')
 		global statusRunStopGbl
 		if (statusRunStopGbl == 1):
 			self.portSerie.close()
-			print('Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
-			MsgLog(self,'Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
+			print(u'Fermeture Port serie '+COMselectGbl + u' car reste ouvert...')
+			MsgLog(self, u'Fermeture Port serie '+COMselectGbl + u' car reste ouvert...')
 		# fermeture de l'appli
 		#screenHome.StopThread()				#stop reader thread
 		#screenHome.portSerie.close()			#cleanup
@@ -863,22 +875,22 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_COMactualiserMnuEvt(self,event):
 		global COMselectGbl
 		# scan port serie dispo:
-		print("<Actualiser> ")
-		MsgLog(self,'Recherche des Ports COM disponibles ...')
-		self.m_statusActionTextStat.SetLabel("Recherche ports COM en cours...")
+		print(u"<Actualiser> ")
+		MsgLog(self,u'Recherche des Ports COM disponibles ...')
+		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
 		FindCOM(self)
-		print("<FIN> ")
-		self.m_statusActionTextStat.SetLabel("Recherche terminer: choisissez un port serie")
+		print(u"<FIN> ")
+		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port serie")
 	#  menu <Select.Manuelle>
 	def m_COMmanuMnuEvt(self,event):
 		global COMselectGbl
 		# scan port serie dispo:
-		print("<Select.Manuel> ")
+		print(u"<Select.Manuel> ")
 		box = wx.TextEntryDialog(None, "Entrez le nom du port serie:\n  Exemple: COM4", "Port serie:", "COM4")
 		if box.ShowModal()==wx.ID_OK:
 			COMselectGbl=box.GetValue()
-		print("Selection manuelle: "+ COMselectGbl)
-		MsgLog(self,"Selection manuelle Port COM: "+ COMselectGbl)
+		print(u"Selection manuelle: "+ COMselectGbl)
+		MsgLog(self, u"Selection manuelle Port COM: "+ COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Selection manuelle: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 	# capture de l'événement selection menu COM non selectionné
@@ -887,7 +899,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMvitesseGbl
 		COMselectGbl = "Non select."
 		COMvitesseGbl = 115200
-		MsgLog(self,"Nouveau profile:    Port COM: "+COMselectGbl+"    Vitesse Port: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Nouveau profile:    Port COM: "+COMselectGbl+ u"    Vitesse Port: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 		self.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
 
@@ -897,8 +909,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		bcb = event.GetEventObject()
 		idx = event.GetInt()
 		COMselectGbl  = bcb.GetString(idx)					# correction depuis wx2.8-examples
-		print("COMselectGbl: " + COMselectGbl)
-		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
+		print(u"COMselectGbl: " + COMselectGbl)
+		MsgLog(self, u"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 
@@ -913,8 +925,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_portComCbxEvtOnTextEnter( self, event ):
 		global COMselectGbl
 		COMselectGbl = event.GetString()
-		print("COMselectGbl: " + COMselectGbl)
-		MsgLog(self,"Selection Port COM: "+ COMselectGbl)
+		print(u"COMselectGbl: " + COMselectGbl)
+		MsgLog(self, u"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
 
@@ -923,75 +935,75 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_115200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 115200
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <57600 bds>
 	def m_57600mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 57600
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <19200 bds>
 	def m_19200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 19200
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <9600 bds>
 	def m_9600mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 9600
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <4800 bds>
 	def m_4800mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 4800
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <2400 bds>
 	def m_2400mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 2400
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
 		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
 	# menu <1200 bds>
 	def m_1200mnuEvt(self,event):
 		global COMvitesseGbl
 		COMvitesseGbl = 1200
-		print("COMvitesseGbl: " + str(COMvitesseGbl))
+		print(u"COMvitesseGbl: " + str(COMvitesseGbl))
 		global COMselectGbl
-		MsgLog(self,"Port COM: "+COMselectGbl+"  Vitesse: "+ str(COMvitesseGbl))
-		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+		MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse: "+ str(COMvitesseGbl))
+		self.m_statusVitesseTextStat.SetLabel(u"Vitesse: "+str(COMvitesseGbl)+" bds")
 
 	######## MENU [Système] ########
 	# menu <gestionnaire de periphérique>
 	def m_gestPeriphMnuEvt(self,event):
 		os.startfile('devmgmt.msc')
-		MsgLog(self,"Menu Systeme: gestionnaire de peripherique")
+		MsgLog(self, u"Menu Systeme: gestionnaire de peripherique")
 
 	########==== ToolBar ====########
 	# icone <Find Port>
 	def m_findPortToolEvt( self, event ):
 		# scan port serie dispo:
-		print("<Actualiser> ")
-		MsgLog(self,'Recherche des Ports COM disponibles ...')
-		self.m_statusActionTextStat.SetLabel("Recherche ports COM en cours...")
+		print(u"<Actualiser> ")
+		MsgLog(self, u'Recherche des Ports COM disponibles ...')
+		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
 		FindCOM(self)
-		print("<FIN> ")
-		self.m_statusActionTextStat.SetLabel("Recherche terminer: choisissez un port serie")
+		print(u"<FIN> ")
+		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port série")
 
 	# Icone <Run Stop>
 	def m_RunStopToolEvt(self,event):
@@ -1022,6 +1034,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			self.m_ExtractNivDetailChk.Show()
 			self.m_ExtractNivDetailLbl.Show()
 			self.m_ExtractNivDetailNum.Show()
+			# Liste des Tables SQL
+			# efface la liste dans ComboBox
+			self.m_tableArchiveCbx.Clear()
+			self.m_tableArchiveCbx.Append(u" - - Actualiser --")
 		else:
 			gDataToSQL = False
 			self.m_dataTool.SetNormalBitmap(screenHome.imageSQLoff)
@@ -1044,13 +1060,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# Icone <Quiter>
 	def m_toolQuiterEvt(self,event):
 		global COMselectGbl
-		print("Menu: Quiter")
-		MsgLog(self,'Menu: Quiter')
+		print(u"Menu: Quiter")
+		MsgLog(self, u'Menu: Quiter')
 		global statusRunStopGbl
 		if (statusRunStopGbl == 1):
 			self.portSerie.close()
-			print('Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
-			MsgLog(self,'Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
+			print(u'Fermeture Port serie '+COMselectGbl +' car reste ouvert...')
+			MsgLog(self, u'Fermeture Port serie '+COMselectGbl + u' car reste ouvert...')
 		screenHome.Close( True )
 
 
@@ -1063,13 +1079,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 # 2014-06-01:	Création
 #####################################################
 def MsgLog(self,message):
-	global ProfileNameGbl
-	global COMselectGbl
-	global COMvitesseGbl
-	#self.logAppliTextCtrl.WriteText(1, 8, wx.TextAttr("RED", "YELLOW"))
-	#self.logAppliTextCtrl.WriteText(wx.TextAttr("RED", "YELLOW"))
-	self.logAppliTextCtrl.WriteText("\n" + time.strftime("%Y-%m-%d %H:%M:%S  " + message))
-	#screenHome.SetTitle("Serial to SQL Logger - Profile="+ProfileNameGbl+" COM="+COMselectGbl+" Vitesse="+str(COMvitesseGbl)+" bds")
+	#print type(message)
+	self.logAppliTextCtrl.WriteText(u'\n' + time.strftime(u'%Y-%m-%d %H:%M:%S  ' + message))
 
 #####################################################
 # 					Fonction AppliTitre(self)
@@ -1083,7 +1094,7 @@ def AppliTitreCreation():
 	global ProfileNameGbl
 	global COMselectGbl
 	global COMvitesseGbl
-	AppliTitreGbl = "Serial to SQL Logger - Profile: ["+ProfileNameGbl+"]  Port:"+COMselectGbl+"  Vitesse:"+str(COMvitesseGbl)+" bds"
+	AppliTitreGbl = u"Serial to SQL Logger - Profile: ["+ProfileNameGbl+ u"]  Port:"+COMselectGbl+ u"  Vitesse:"+str(COMvitesseGbl)+ u" bds"
 
 #####################################################
 # 					Fonction scan()
@@ -1114,7 +1125,7 @@ def scan():
 def FindCOM(self):
 	# efface la liste dans ComboBox
 	self.m_portComCbx.Clear()
-	print "Ports dispo:"
+	print u"Ports dispo:"
 	# scan port serie dispo:
 	for n,s in scan():
 		print "(%d) %s" % (n,s)
@@ -1173,7 +1184,7 @@ def Save(self, folderName, fileName):
 	global COMselectGbl
 	global COMvitesseGbl
 	global enableBlinkGbl
-	print("Menu: Enregistrer Logs")
+	print(u"Menu: Enregistrer Logs")
 	enableBlinkGbl = False
 	# enregistre si fichier/dossier ont un nom
 	if (self.logFileName !="") and (self.logFolderName != ""):
@@ -1182,18 +1193,18 @@ def Save(self, folderName, fileName):
 			pointeurFichier = file(os.path.join(folderName, fileName), 'w')
 			# écriture du fichier
 			pointeurFichier.write(COMselectGbl)
-			MsgLog(self,'Fichier Enregistrer: ' + os.path.join(FolderName, FileName) + ' Sauvegarde ok')
+			MsgLog(self, u'Fichier Enregistrer: ' + os.path.join(FolderName, FileName) + u' Sauvegarde ok')
 			return True
 		except:
-			MsgLog(self,'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
-			print('Erreur ecriture du fichier: '+self.logFileName)
+			MsgLog(self, u'Erreur ecriture du fichier: '+ os.path.join(self.logFolderName, self.logFileName))
+			print(u'Erreur écriture du fichier: '+self.logFileName)
 			boxErr = wx.MessageDialog(None,'Erreur ecriture du fichier: '+self.logFileName, 'Erreur enregistrement fichier:', wx.OK)
 			reponse=boxErr.ShowModal()
 			boxErr.Destroy()
 			return False
 	# sinon popup <Enregistrer sous...>
 	else:
-		print('Fichier sans nom: go <Enregistrer sous...> ')
+		print(u'Fichier sans nom: go <Enregistrer sous...> ')
 		self.m_LogSaveAsMnuEvt(self)
 	enableBlinkGbl = True
 
@@ -1235,12 +1246,12 @@ def DecodageRefresh(self):
 	global gExtractNivDetailNum
 	global gCaractereSeparateurTxt
 	global gCaractereSeparateurEnable
-	print('gExtractHorodatageChk=      ' + str(gExtractHorodatageChk))
-	print('gExtractCategorieChk=       ' + str(gExtractCategorieChk))
-	print('gExtractCategorieTxt=       ' + gExtractCategorieTxt)
-	print('gExtractNivDetailChk=        ' + str(gExtractNivDetailChk))
-	print('gExtractNivDetailNum=        ' + str(gExtractNivDetailNum))
-	print('gCaractereSeparateurTxt=    ' + gCaractereSeparateurTxt)
+	print(u'gExtractHorodatageChk=      ' + str(gExtractHorodatageChk))
+	print(u'gExtractCategorieChk=       ' + str(gExtractCategorieChk))
+	print(u'gExtractCategorieTxt=       ' + gExtractCategorieTxt)
+	print(u'gExtractNivDetailChk=        ' + str(gExtractNivDetailChk))
+	print(u'gExtractNivDetailNum=        ' + str(gExtractNivDetailNum))
+	print(u'gCaractereSeparateurTxt=    ' + gCaractereSeparateurTxt)
 	self.m_ExtractHorodateChk.SetValue(gExtractHorodatageChk)
 	self.m_ExtractCategorieChk.SetValue(gExtractCategorieChk)
 	self.m_CategorieTxt.Value = gExtractCategorieTxt
@@ -1262,12 +1273,17 @@ def MysqlInsert(self,categorie,niv_detail,message):
 	gExtractHorodatageChkRang = 0
 	gExtractCategorieChkRang  = 0
 	gExtractNivDetailChkRang  = 0
+	SQLserver  = "localhost"
+	SQLuser    = "root"
+	SQLpasswd  = ""
+	SQLdataBase= "serial_sql_logger_data"
 	try:
 		#MysqlInsert: print "base MySQL ouverture..."
-		db = MySQLdb.connect(host="192.168.1.150",user="root",passwd="mysql",db="serial_sql_logger")
+		db = MySQLdb.connect(host=SQLserver,user=SQLuser,passwd=SQLpasswd,db=SQLdataBase)
 	except Exception:
+		MsgLog(self, u'Erreur connexion SQL vers ' + SQLserver)
 		# appel popup erreur connexion MySQL
-		boxErr = wx.MessageDialog(None,'Erreur connexion MySQL vers 192.168.1.150', 'Erreur:', wx.OK)
+		boxErr = wx.MessageDialog(None,'Erreur connexion SQL vers ' + SQLserver, 'Erreur:', wx.OK)
 		reponse=boxErr.ShowModal()
 		boxErr.Destroy()
 	else:
@@ -1275,8 +1291,8 @@ def MysqlInsert(self,categorie,niv_detail,message):
 		# oui: au moins une extraction
 		if gExtractHorodatageChk or gExtractCategorieChk or gExtractNivDetailChk:
 			messageSplit = message.split(gCaractereSeparateurTxt)
-			print"====================================="
-			print  messageSplit 
+			#print u"====================================="
+			#print  messageSplit 
 			#====  horodatage inclus dans message ?
 			# oui: horodatage inclus dans message donc on l'extrait
 			if gExtractHorodatageChk:
@@ -1304,7 +1320,12 @@ def MysqlInsert(self,categorie,niv_detail,message):
 			else:
 				gExtractNivDetailChkRang = 0	
 				niv_detailSQL   = gExtractNivDetailNum
-			messageSQL = messageSplit[gExtractHorodatageChkRang + gExtractCategorieChkRang + gExtractNivDetailChkRang]
+			try:
+				messageSQL = messageSplit[gExtractHorodatageChkRang + gExtractCategorieChkRang + gExtractNivDetailChkRang]
+			except Exception:
+				MsgLog(self,u'Erreur separation texte avec separateur: "' + gCaractereSeparateurTxt + u'". Forcage horodatage')
+				dateTimeSQL  = (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:00"))
+				messageSQL   = message
 		# non: pas d'extraction
 		else:
 			# date heure système +catégorie saisie +niveau détail saisie +message brut
@@ -1313,36 +1334,38 @@ def MysqlInsert(self,categorie,niv_detail,message):
 			niv_detailSQL= gExtractNivDetailNum
 			messageSQL   = message
 		# composition de la requete SQL
-		print "== composition requete =="
+		#print u"== composition requete =="
+		#print "message=" + message
 		#print "dateTimeSQL  : " + dateTimeSQL
 		#print "categorieSQL : " + categorieSQL
 		#print "niv_detailSQL: " + niv_detailSQL
 		#print "messageSQL   : " + messageSQL
-		requeteHeader = "INSERT INTO arduino (horodatage,categorie,niv_detail,message) "
+		requeteSQL = ""
+		requeteHeader = "INSERT INTO bacacier07ligne01 (horodatage,categorie,niv_detail,message) "
 		try:
 			requeteSQL = requeteHeader + "VALUES ('"+dateTimeSQL+"','"+categorieSQL+"','"+str(niv_detailSQL)+"','"+messageSQL+"')"
 		except Exception:
-			print "MysqlInsert: Erreur avec la composition Requete"
-		else:
-			print "MysqlInsert: Pas d erreur avec la composition Requete"
+			print u"MysqlInsert: Erreur avec la composition Requête"
+		#else:
+			#print u"MysqlInsert: Pas d erreur avec la composition Rêquete"
 		# tentative d'execussion de la requete
 		try:
-			#print "MysqlInsert: base MySQL ouverte"
+			#print u"MysqlInsert: base MySQL ouverte"
 			cur = db.cursor() 
 			# execute la requete
 			cur.execute(requeteSQL)
-			print "MysqlInsert: ...Mise a jour de la base"
+			#print u"MysqlInsert: ...Mise à jour de la base"
 			db.commit()
 		except Exception:
-			print "MysqlInsert: Erreur avec la Requete= " + requete
-			print "MysqlInsert: ...Retour etat precedant de la base"
+			print u"MysqlInsert: Erreur avec la Requête= " + requeteSQL
+			print u"MysqlInsert: ...Retour etat précédant de la base"
 			db.rollback()
 		else:
-			print "MysqlInsert: Requete executee avec:"
-			print requeteSQL
+			#print u"MysqlInsert: Requête éxecutée avec:"
+			#print requeteSQL
+			#MsgLog(self, requeteSQL)
 			db.close()
-			print "MysqlInsert: base fermee"
-			print "MysqlInsert: ok"
+			#print u"MysqlInsert: base fermée. Fin"
 
 
 
@@ -1350,11 +1373,11 @@ def MysqlInsert(self,categorie,niv_detail,message):
 #================ DEBUT APPLI ================
 # Dossier de l'appli
 appliFolderName = os.getcwd()
-print "appliFolderName= " + appliFolderName
+print u"appliFolderName= " + appliFolderName
 # detection de l'OS
-print "Architecture systeme:"
+print u"Architecture systeme:"
 print platform.architecture()
-print "Systeme d'exploitation:"
+print u"Systeme d'exploitation:"
 print platform.platform()
 plateformeComplete = platform.platform()
 plateformeTab = plateformeComplete.split('-')
@@ -1368,7 +1391,7 @@ else:
 # detection architecture 32/64 bits
 g_archiTab     = platform.architecture()
 g_architectBits = g_archiTab[0]+'s'
-print('g_architectBits='+g_architectBits)
+print(u'g_architectBits='+g_architectBits)
 
 # start GUI
 app = wx.App(False)

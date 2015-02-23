@@ -131,6 +131,9 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_menubar1.Append( self.m_systemeMnu, u"Système" ) 
 		
+		self.m_serveur = wx.Menu()
+		self.m_menubar1.Append( self.m_serveur, u"Serveur" ) 
+		
 		self.SetMenuBar( self.m_menubar1 )
 		
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
@@ -292,7 +295,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_COMdispoTxt.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		self.m_toolBar1.AddControl( self.m_COMdispoTxt )
-		self.m_portComCbx = wx.combo.BitmapComboBox( self.m_toolBar1, wx.ID_ANY, u"COM4", wx.Point( -1,-1 ), wx.Size( -1,-1 ), "", 0 ) 
+		self.m_portComCbx = wx.combo.BitmapComboBox( self.m_toolBar1, wx.ID_ANY, wx.EmptyString, wx.Point( -1,-1 ), wx.Size( -1,-1 ), "", 0 ) 
 		self.m_portComCbx.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		self.m_portComCbx.SetBackgroundColour( wx.Colour( 230, 230, 230 ) )
 		self.m_portComCbx.SetToolTipString( u"Liste des ports de communication disponible" )
@@ -319,10 +322,19 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_dataTool = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"SQL", wx.Bitmap( u"Icons/ToolBar/data-disable_32x32.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
-		self.m_bitmap8 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_360x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bitmap41 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_toolBar1.AddControl( self.m_bitmap41 )
+		m_tableArchiveCbxChoices = []
+		self.m_tableArchiveCbx = wx.ComboBox( self.m_toolBar1, wx.ID_ANY, u"Hacklab", wx.DefaultPosition, wx.DefaultSize, m_tableArchiveCbxChoices, 0 )
+		self.m_toolBar1.AddControl( self.m_tableArchiveCbx )
+		self.m_bitmap8 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_200x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_bitmap8.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 		
 		self.m_toolBar1.AddControl( self.m_bitmap8 )
+		self.m_bitmap81 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_50x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_bitmap81.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		
+		self.m_toolBar1.AddControl( self.m_bitmap81 )
 		self.m_toolQuiter = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"Quiter", wx.Bitmap( u"Icons/ToolBar/system-shutdown.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Quiter l'application", wx.EmptyString, None ) 
 		
 		self.m_toolBar1.Realize() 

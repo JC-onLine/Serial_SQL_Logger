@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap Template</title>
+
+    <!-- Liaisons aux fichiers css de Bootstrap -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="dist/css/bootstrap-theme.min.css" rel="stylesheet"/>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="assets/js/html5shiv.min.js"></script>
+      <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+	<h1 class="titre">Les citations</h1>
+    <blockquote>
+		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+			nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. 
+			Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper 
+			suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
+    </blockquote>
+    <p>Bravo vous avez <span class="label label-success">réussi</span>!</p>
+    <h1>Hello, world!</h1>
+
+	<?php
+	// connexion SQL
+	$server = "localhost";
+	$user   = "root";
+	$passwd = "";
+	$bdd    = "serial_sql_logger";
+	$port   = "3306";
+	// tantative de connexion
+	try {
+		$connexion = new PDO('mysql:host='.$server.';port='.$port.';dbname='.$bdd, $user, $passwd);
+	}
+	// capture éventuelle erreur
+	catch(PDOExeption $e){
+		echo 'N° : '.$e->getCode().'<br />';
+		die ('Erreur : '.$e->getMessage().'<br />');
+	}
+	// suite si pas erreur connexion
+	echo '<p>Connexion ok</p>';
+	?>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="assets/js/jquery-1.11.2.min.js" type="text/javascript"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="dist/js/bootstrap.min.js" type="text/javascript"></script>
+  </body>
+</html>
