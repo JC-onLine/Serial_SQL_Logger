@@ -87,9 +87,19 @@
 # 2015-02-16:	PHP: Ajout filtre catégorie: Toutes+Aucune+séparateur
 # 2015-02-17:	PHP: Suppression format bootstrap du tableau. retour custom
 # 2015-02-18:	PHP: Ajout du marqueur de ligne
+# 2015-02-23:	PHP: Ajout css 'active' dans selection en cours menu bootstrap
+# 2015-02-24:	GIT: Utilisation de Ungit pour le versioning
+# 2015-02-24:	GUI: Ajout menu encodage Entrée série/Sortie SQL
+# 2015-02-25:	Ajout table archive dispo dans liste ComboBox avec actualisation	
+#				Ajout séléction par défaut séparateur '|' si coche 'Horodadage..'
+#				Ajout logs checkBox extraction pour SQL
 #
 #####################################################################################
 # TODO:
+# [Python]
+#		[x] Ajouter menu sélection liste encodage entrée/sortie 2015-02-25
+#		[ ] Ajouter menu sélection serveur
+#		[x] Ajouter menu sélection tables disponibles 2015-02-25
 #		[x] Marquer le nom du fichier en cours dans la barre de titre appli
 #		[x] Raccourcie clavier Ctrl+N Ctrl+O Ctrl+S Ctrl+Shift+S Ctrl+Q
 #		[ ] Mettre une icônes dans la barre de titre appli
@@ -100,11 +110,18 @@
 #		[ ] Faire apparaitre commentaire affect port COM ex: COM4 'Bluetooth' 
 #			-> memoriser non machine et proposer la catalogue des ports COM
 #		[ ] Ajouter zone saisie 'Terminal'
-#		[ ] Ajouter animation sur bouton Play/Stop toolbar
-#		[ ] Ajouter enregistrement SQL des logs
-#		[ ] Ajouter logs des checkBox
-#		[ ] Ajouter dossier 'Progile' pour enregistrement des Profile
-#		[ ] Ajouter dossier 'Logs' pour enregistrement des Logs provenant port série
+#		[/] Ajouter animation sur bouton Play/Stop toolbar. (voir sous linux))
+#		[x] Ajouter enregistrement SQL des logs 2014-09-24
+#		[x] Ajouter logs des checkBox 2015-02-25
+#		[x] Ajouter dossier 'Progile' pour enregistrement des Profile
+#		[x] Ajouter dossier 'Logs' pour enregistrement des Logs provenant port série
+# [PHP]
+#		[ ] Ajouter filtre par Niv détails
+#		[ ] Céer page dashboard: 
+#		[ ] -> réglages largeurs colonnes du tableau
+#		[ ] -> surlignage des mots clés avec leur couleur.
+#		[ ] 
+#
 #####################################################################################
 
 from __future__ import unicode_literals
@@ -128,11 +145,9 @@ import time
 import ConfigParser
 # gestion base MySQL
 import MySQLdb
-# gestion date/heure
-import time
 
 # variables globales
-global gSerialLog
+# Série
 global COMselectGbl
 global COMvitesseGbl
 global statusRunStopGbl
@@ -143,6 +158,7 @@ global runBlinkGbl
 global enableBlinkGbl
 global enableErrBlinkGbl
 global bmpCirculaireIndexGbl
+# SQL
 global gExtractHorodatageChk
 global gExtractCategorieChk
 global gExtractCategorieTxt
@@ -150,7 +166,18 @@ global gExtractNivDetailChk
 global gExtractNivDetailNum
 global gCaractereSeparateurTxt
 global gCaractereSeparateurEnable
-global gDataToSQL
+global gSQLenable
+global gDecodeSerieTxt
+global gDecodeSerieISO_8859_15Chk
+global gDecodeSerieWin1252Chk
+global gDecodeSerieUTF8Chk
+global gDecodeSerieCP850Chk
+global gEncodeSqlTxt
+global gEncodeSqlISO_8859_15Chk
+global gEncodeSqlWin1252Chk
+global gEncodeSqlUTF8Chk
+global gEncodeSqlCP850Chk
+global gSQLcompleteLine
 
 LF = serial.to_bytes([10])
 CR = serial.to_bytes([13])
@@ -322,9 +349,14 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# mise à jour variable globale 'Extraction Horodatage'
 		global gExtractHorodatageChk
 		if event.IsChecked():
-			gExtractHorodatageChk = True
+			gExtractHorodatageChk	= True
+			# sélection séparateur '|' par défaut
+			self.m_separateurCbx.SetSelection(0)
+			gCaractereSeparateurTxt	= '|'
+			MsgLog(self, u'SQL: Extraction Horodatage: Actif')
 		else:
-			gExtractHorodatageChk = False
+			gExtractHorodatageChk	= False
+			MsgLog(self, u'SQL: Extraction Horodatage: Innactif')
 		print u"gExtractHorodatageChk = " + str(gExtractHorodatageChk)
 		SeparateurEnable(self)
 
@@ -337,11 +369,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			#Désactivation saisie txt 'Catégorie'
 			#car le nom de la catégorie sera extraite des logs
 			self.m_CategorieTxt.Enable(False)
+			MsgLog(self, u'SQL: Extraction Categorie: Actif')
 		else:
 			gExtractCategorieChk = False	# update image var globale
 			#Activation saisie txt 'catégorie'
 			#pour saisir manuellement la catégorie pour SQL
 			self.m_CategorieTxt.Enable(True)
+			MsgLog(self, u'SQL: Extraction Categorie: Innatif')
 		print u"gExtractCategorieChk = " + str(gExtractCategorieChk)
 		SeparateurEnable(self)
 
@@ -365,11 +399,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			#Désactivation saisie txt 'Priorité'
 			#car le nom de la catégorie sera extraite des logs
 			self.m_ExtractNivDetailNum.Enable(False)
+			MsgLog(self, u'SQL: Extraction Priorite: Actif')
 		else:
 			gExtractNivDetailChk = False		# update image var globale
 			#Activation saisie txt 'Priorité'
 			#pour saisir manuellement la  Priorité pour SQL
 			self.m_ExtractNivDetailNum.Enable(True)
+			MsgLog(self, u'SQL: Extraction Priorite: Innactif')
 		print u"gExtractNivDetailChk = " + str(gExtractNivDetailChk)
 		SeparateurEnable(self)
 
@@ -378,6 +414,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractNivDetailNum
 		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
 		print u"gExtractNivDetailNum Evt = " + str(gExtractNivDetailNum)
+		MsgLog(self, u'SQL: Extraction Num Priorite: ' + str(gExtractNivDetailNum))
 	# capture de l'événement Saisie 'niveau détail' OnSpinCtrlText
 	def m_ExtractNivDetailNumEvtTxt(self,event):
 		global gExtractNivDetailNum
@@ -388,12 +425,14 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gExtractNivDetailNum
 		gExtractNivDetailNum = self.m_ExtractNivDetailNum.GetValue()
 		print u"gExtractNivDetailNum EvtEnter = " + str(gExtractNivDetailNum)
+		MsgLog(self, u'SQL: Extraction Num Priorite: ' + str(gExtractNivDetailNum))
 
 	# capture de l'événement Sélection Cbo Evt 'Caractère séparateur'
 	def m_separateurCbxEvt(self,event):
 		global gCaractereSeparateurTxt
 		gCaractereSeparateurTxt = self.m_separateurCbx.GetValue()
 		print(u"gCaractereSeparateurTxt Evt = " + gCaractereSeparateurTxt)
+		MsgLog(self, u'SQL: Caractere separateur: ' + gCaractereSeparateurTxt)
 	# capture de l'événement Sélection Cbo OnText 'Caractère séparateur'
 	def m_separateurCbxOnText(self,event):
 		global gCaractereSeparateurTxt
@@ -535,65 +574,41 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		
 	# Lecture du port Série			
 	def reader(self):
+		global gDecodeSerieTxt
+		global gEncodeSqlTxt
+		global gSQLcompleteLine
 		# la liste texte est: logTextCtrl.Value = ""
 		try:
-			global gSerialLog
 			while self.alive and self._reader_alive:
 				#desactive le RUN/STOP clignotant pour optimiser la réception
 				enableBlinkGbl = False
-				# lecture du port série
-				data = self.portSerie.read(1)
-				if ((data == "'") or (data == '"')):
-					data = ""
-				# conversion décodage cp1252 (windows)
-				data = data.decode('latin_1', errors='replace')
-				if self.repr_mode == 9:
-					self.logTextCtrl.WriteText(data)
-				elif self.repr_mode == 0:
-					# direct output, just have to care about newline setting
-	#					if data == '\r' and self.convert_outgoing == CONVERT_CR:
-					# si reception CR
-					if data == '\r':
-						#sys.stdout.write('\n')
-	#####					self.logTextCtrl.WriteText('\n')
-						# enregistrement SQL activé ?
-						if gDataToSQL:
-							# encodage utf-8 (pas windows, mais le reste du monde)
-							dataTmp = data.encode('utf_8', errors='replace')
-							gSerialLog = gSerialLog + dataTmp
-							# enregistrement données reçu du port série en SQL
-							MysqlInsert(self,"bacacier07ligne01", "1", gSerialLog)
-							gSerialLog = ""
+				# lecture du port série, décodage à la voléeselon selection menu 'encodage / entrée série'
+				serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
+				# caractère reçu ?
+				if (serialData != ""):
+					# Filtrage des guillemets à cause de SQL
+					if ((serialData == "'") or (serialData == '"') or (serialData == '\n')):
+						serialData = ""
+					# affichage caractère dans GUI
+					print type(serialData)
+					pourAffichage = serialData.encode('cp1252', errors='replace')
+					print type(pourAffichage)
+					self.logTextCtrl.WriteText(pourAffichage)
+					# si reception CR et SQL actif on doit enregistrer dans SQL
+					if ((serialData == '\r') and gSQLenable):
+						# enregistrement données reçu du port série en SQL
+						MysqlInsert(self, gSQLcompleteLine)
+						gSQLcompleteLine = ""
+					# pas de CR
 					else:
-						#sys.stdout.write(data)
-						self.logTextCtrl.WriteText(data)
-						gSerialLog = gSerialLog + data
-				elif self.repr_mode == 1:
-					# escape non-printable, let pass newlines
-					if self.convert_outgoing == CONVERT_CRLF and data in '\r\n':
-						if data == '\n':
-							self.logTextCtrl.WriteText('\n')
-					elif data == '\r':
-						pass
-					elif data == '\n' and self.convert_outgoing == CONVERT_LF:
-						self.logTextCtrl.WriteText('\n')
-					elif data == '\r' and self.convert_outgoing == CONVERT_CR:
-						self.logTextCtrl.WriteText('\n')
-					else:
-						self.logTextCtrl.WriteText(repr(data)[1:-1])
-				elif self.repr_mode == 2:
-					# escape all non-printable, including newline
-					self.logTextCtrl.WriteText(repr(data)[1:-1])
-				elif self.repr_mode == 3:
-					# escape everything (hexdump)
-					for c in data:
-						sys.stdout.write("%s " % c.encode('hex'))
-				sys.stdout.flush()
-				enableBlinkGbl = True
+						# enrichissement de la ligne pour SQL
+						# avec conversion encodage selon selection menu 'encodage / sortie SQL'
+						if gSQLenable:
+##							gSQLcompleteLine = gSQLcompleteLine + serialData.encode(gEncodeSqlTxt, errors='replace')
+							gSQLcompleteLine = gSQLcompleteLine + serialData
 		except serial.SerialException, e:
 			self.alive = False
-			# would be nice if the console reader could be interruptted at this
-			# point...
+			MsgLog(self, u'Erreur de traitement de la reception')
 			raise
 
 
@@ -831,7 +846,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			self.m_ProfileSaveAsMnuEvt(self)
 		enableBlinkGbl = True
 		
-		
 	# capture de l'événement selection menu <ProfileSaveAs>
 	def m_ProfileSaveAsMnuEvt( self, event ):
 		global AppliTitreGbl
@@ -880,6 +894,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
 		FindCOM(self)
 		print(u"<FIN> ")
+		MsgLog(self,u'Recherche terminer: choisissez un port serie')
 		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port serie")
 	#  menu <Select.Manuelle>
 	def m_COMmanuMnuEvt(self,event):
@@ -994,6 +1009,114 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		os.startfile('devmgmt.msc')
 		MsgLog(self, u"Menu Systeme: gestionnaire de peripherique")
 
+	######## MENU [Encodage] ########
+	# menu <Décodage entrée série / UTF-8>
+	def m_decodeUTF8MnuEvt(self,event):
+		global gDecodeSerieTxt
+		global gDecodeSerieISO_8859_15Chk
+		global gDecodeSerieWin1252Chk
+		global gDecodeSerieUTF8Chk
+		global gDecodeSerieCP850Chk
+		gDecodeSerieTxt		 		= "utf_8"
+		gDecodeSerieISO_8859_15Chk	= False
+		gDecodeSerieWin1252Chk		= False
+		gDecodeSerieUTF8Chk			= True
+		gDecodeSerieCP850Chk		= False
+		MsgLog(self, u"Menu encodage: Entree serie -> UTF-8 (Unicode )")
+	# menu <Décodage entrée série / Win1252>
+	def m_decodeWin1252MnuEvt(self,event):
+		global gDecodeSerieTxt
+		global gDecodeSerieISO_8859_15Chk
+		global gDecodeSerieWin1252Chk
+		global gDecodeSerieUTF8Chk
+		global gDecodeSerieCP850Chk
+		gDecodeSerieTxt		 		= "cp1252"
+		gDecodeSerieISO_8859_15Chk	= False
+		gDecodeSerieWin1252Chk		= True
+		gDecodeSerieUTF8Chk			= False
+		gDecodeSerieCP850Chk		= False
+		MsgLog(self, u"Menu encodage: Entree serie -> cp1252 (Windows ,Western)")
+	# menu <Décodage entrée série / cp850>
+	def m_decodeCP850MnuEvt(self,event):
+		global gDecodeSerieTxt
+		global gDecodeSerieISO_8859_15Chk
+		global gDecodeSerieWin1252Chk
+		global gDecodeSerieUTF8Chk
+		global gDecodeSerieCP850Chk
+		gDecodeSerieTxt		 		= "cp850"
+		gDecodeSerieISO_8859_15Chk	= False
+		gDecodeSerieWin1252Chk		= False
+		gDecodeSerieUTF8Chk			= False
+		gDecodeSerieCP850Chk		= True
+		MsgLog(self, u"Menu encodage: Entree serie -> cp850 (MS-DOS )")
+	# menu <Décodage entrée série / ISO-8859-15>
+	def m_decodeISO_8859_15MnuEvt(self,event):
+		global gDecodeSerieTxt
+		global gDecodeSerieISO_8859_15Chk
+		global gDecodeSerieWin1252Chk
+		global gDecodeSerieUTF8Chk
+		global gDecodeSerieCP850Chk
+		gDecodeSerieTxt		 		= "iso8859_15"
+		gDecodeSerieISO_8859_15Chk	= True
+		gDecodeSerieWin1252Chk		= False
+		gDecodeSerieUTF8Chk			= False
+		gDecodeSerieCP850Chk		= False
+		MsgLog(self, u"Menu encodage: Entree serie -> ISO-8859-15 (Latin-1, West Europe,Touche Euro)")
+
+	######## MENU [Encodage] ########
+	# menu <Encodage sortie SQL / UTF-8>
+	def m_encodeUTF8MnuEvt(self,event):
+		global gEncodeSqlTxt
+		global gEncodeSqlISO_8859_15Chk
+		global gEncodeSqlWin1252Chk
+		global gEncodeSqlUTF8Chk
+		global gEncodeSqlCP850Chk
+		gEncodeSqlTxt		 		= "utf_8"
+		gEncodeSqlISO_8859_15Chk	= False
+		gEncodeSqlWin1252Chk		= False
+		gEncodeSqlUTF8Chk			= True
+		gEncodeSqlCP850Chk			= False
+		MsgLog(self, u"Menu encodage: Sortie SQL -> UTF-8 (Unicode )")
+	# menu <Encodage sortie SQL / Win1252>
+	def m_encodeWin1252MnuEvt(self,event):
+		global gEncodeSerieTxt
+		global gEncodeSerieISO_8859_15Chk
+		global gEncodeSerieWin1252Chk
+		global gEncodeSerieUTF8Chk
+		global gEncodeSerieCP850Chk
+		gEncodeSqlTxt		 		= "cp1252"
+		gEncodeSqlISO_8859_15Chk	= False
+		gEncodeSqlWin1252Chk		= True
+		gEncodeSqlEncodeUTF8Chk		= False
+		gEncodeSqlEncodeCP850Chk	= False
+		MsgLog(self, u"Menu encodage: Sortie SQL -> cp1252 (Windows ,Western)")
+	# menu <Encodage sortie SQL / cp850>
+	def m_encodeCP850MnuEvt(self,event):
+		global gEncodeSqlTxt
+		global gEncodeSqlISO_8859_15Chk
+		global gEncodeSqlWin1252Chk
+		global gEncodeSqlUTF8Chk
+		global gDecodeSerieEncodeCP850Chk
+		gEncodeSqlTxt		 		= "cp850"
+		gEncodeSqlISO_8859_15Chk	= False
+		gEncodeSqlWin1252Chk		= False
+		gEncodeSqlUTF8Chk			= False
+		gEncodeSqlCP850Chk			= True
+		MsgLog(self, u"Menu encodage: Sortie SQL -> cp850 (MS-DOS )")
+	# menu <Encodage sortie SQL / ISO-8859-15>
+	def m_encodeISO_8859_15MnuEvt(self,event):
+		global gEncodeSqlTxt
+		global gEncodeSqlISO_8859_15Chk
+		global gEncodeSqlWin1252Chk
+		global gEncodeSqlUTF8Chk
+		global gEncodeSqlCP850Chk
+		gEncodeSqlTxt		 		= "iso8859_15"
+		gEncodeSqlISO_8859_15Chk	= True
+		gEncodeSqlWin1252Chk		= False
+		gEncodeSqlUTF8Chk			= False
+		gEncodeSqlCP850Chk			= False
+		MsgLog(self, u"Menu encodage: Sortie SQL -> ISO-8859-15 (Latin-1, West Europe,Touche Euro)")
+
 	########==== ToolBar ====########
 	# icone <Find Port>
 	def m_findPortToolEvt( self, event ):
@@ -1003,6 +1126,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
 		FindCOM(self)
 		print(u"<FIN> ")
+		MsgLog(self,u'Recherche terminer: choisissez un port serie')
 		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port série")
 
 	# Icone <Run Stop>
@@ -1015,9 +1139,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 
 	# Icone <SQL on/off>
 	def m_dataToolEvt(self,event):
-		global gDataToSQL
-		if not gDataToSQL:
-			gDataToSQL = True
+		global gSQLenable
+		global gSQLlisteTable
+		if not gSQLenable:
+			gSQLenable = True
 			self.m_dataTool.SetNormalBitmap(screenHome.imageSQLon)
 			self.m_toolBar1.Realize()
 			#self.spacer_10x60.Show()
@@ -1038,8 +1163,16 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			# efface la liste dans ComboBox
 			self.m_tableArchiveCbx.Clear()
 			self.m_tableArchiveCbx.Append(u" - - Actualiser --")
+			# lecture des tables dispo
+			MysqlShowTable(self)
+			# ajout tables dispo dans combobox GUI
+			print u'Ajout liste table cbo'
+			for afficheTable in gSQLlisteTable:
+				self.m_tableArchiveCbx.Append(afficheTable)
+				print afficheTable
+			MsgLog(self, u'SQL: actif')
 		else:
-			gDataToSQL = False
+			gSQLenable = False
 			self.m_dataTool.SetNormalBitmap(screenHome.imageSQLoff)
 			self.m_toolBar1.Realize()
 			#self.spacer_10x60.Hide()
@@ -1056,6 +1189,27 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			self.m_ExtractNivDetailChk.Hide()
 			self.m_ExtractNivDetailLbl.Hide()
 			self.m_ExtractNivDetailNum.Hide()
+			MsgLog(self, u'SQL: innactif')
+
+	# Icone <CBO liste table d'archive>
+	def m_tableArchiveCbxEvt(self,event):
+		global gSQLdataTable
+		# test si on ré-actualise la CBO
+		if self.m_tableArchiveCbx.GetSelection() == 0:
+			# reset de la liste
+			gSQLlisteTable[:] = []
+			self.m_tableArchiveCbx.Clear()
+			self.m_tableArchiveCbx.Append(u" - - Actualiser --")
+			# actualisation de la liste
+			MysqlShowTable(self)
+			# ajout tables dispo dans combobox GUI
+			print u'Ajout liste table cbo'
+			for afficheTable in gSQLlisteTable:
+				self.m_tableArchiveCbx.Append(afficheTable)
+			MsgLog(self, u'SQL: Actualisation.')
+		else:
+			gSQLdataTable =  self.m_tableArchiveCbx.GetStringSelection() 
+			print gSQLdataTable
 
 	# Icone <Quiter>
 	def m_toolQuiterEvt(self,event):
@@ -1269,21 +1423,21 @@ def DecodageRefresh(self):
 # Appelé par:	bouton GUI, fonction port série
 # 2014-09-23:	Création
 #####################################################
-def MysqlInsert(self,categorie,niv_detail,message):
+def MysqlInsert(self,message):
 	gExtractHorodatageChkRang = 0
 	gExtractCategorieChkRang  = 0
 	gExtractNivDetailChkRang  = 0
-	SQLserver  = "localhost"
-	SQLuser    = "root"
-	SQLpasswd  = ""
-	SQLdataBase= "serial_sql_logger_data"
+	global gSQLserver
+	global gSQLuser
+	global gSQLpasswd
+	global gSQLdataBase
 	try:
 		#MysqlInsert: print "base MySQL ouverture..."
-		db = MySQLdb.connect(host=SQLserver,user=SQLuser,passwd=SQLpasswd,db=SQLdataBase)
+		db = MySQLdb.connect(host=gSQLserver,user=gSQLuser,passwd=gSQLpasswd,db=gSQLdataBase)
 	except Exception:
-		MsgLog(self, u'Erreur connexion SQL vers ' + SQLserver)
+		MsgLog(self, u'Erreur connexion SQL vers ' + gSQLserver)
 		# appel popup erreur connexion MySQL
-		boxErr = wx.MessageDialog(None,'Erreur connexion SQL vers ' + SQLserver, 'Erreur:', wx.OK)
+		boxErr = wx.MessageDialog(None,'Erreur connexion SQL vers ' + gSQLserver, 'Erreur:', wx.OK)
 		reponse=boxErr.ShowModal()
 		boxErr.Destroy()
 	else:
@@ -1341,9 +1495,9 @@ def MysqlInsert(self,categorie,niv_detail,message):
 		#print "niv_detailSQL: " + niv_detailSQL
 		#print "messageSQL   : " + messageSQL
 		requeteSQL = ""
-		requeteHeader = "INSERT INTO bacacier07ligne01 (horodatage,categorie,niv_detail,message) "
+		requeteHeader = u"INSERT INTO " + gSQLdataTable + u" (horodatage,categorie,niv_detail,message) "
 		try:
-			requeteSQL = requeteHeader + "VALUES ('"+dateTimeSQL+"','"+categorieSQL+"','"+str(niv_detailSQL)+"','"+messageSQL+"')"
+			requeteSQL = requeteHeader + u"VALUES ('"+dateTimeSQL + u"','"+categorieSQL + u"','"+str(niv_detailSQL) + u"','"+messageSQL + u"')"
 		except Exception:
 			print u"MysqlInsert: Erreur avec la composition Requête"
 		#else:
@@ -1366,7 +1520,62 @@ def MysqlInsert(self,categorie,niv_detail,message):
 			#MsgLog(self, requeteSQL)
 			db.close()
 			#print u"MysqlInsert: base fermée. Fin"
-
+			
+#####################################################
+# 					Fonction MysqlShowTable(self)
+# Principe	:	Donne la liste des table SQL disponibles
+# Dépandence:	Aucune
+# Appelé par:	bouton GUI SQL
+# 2015-02-25:	Création
+#####################################################
+def MysqlShowTable(self):
+	global gSQLserver
+	global gSQLuser
+	global gSQLpasswd
+	global gSQLdataBase
+	global gSQLlisteTable
+	try:
+		#MysqlInsert: print "base MySQL ouverture..."
+		db = MySQLdb.connect(host=gSQLserver,user=gSQLuser,passwd=gSQLpasswd,db=gSQLdataBase)
+	except Exception:
+		MsgLog(self, u'Erreur connexion SQL vers ' + gSQLserver)
+		# appel popup erreur connexion MySQL
+		boxErr = wx.MessageDialog(None,'Erreur connexion SQL vers ' + gSQLserver, 'Erreur:', wx.OK)
+		reponse=boxErr.ShowModal()
+		boxErr.Destroy()
+	else:
+		# composition de la requete SQL
+		requeteSQL = "SHOW TABLE STATUS FROM serial_sql_logger_data;"
+		try:
+			requeteSQL = requeteSQL
+		except Exception:
+			print u"MysqlShowTable: Erreur avec la composition Requête"
+		#else:
+			#print u"MysqlInsert: Pas d erreur avec la composition Rêquete"
+		# tentative d'execussion de la requete
+		try:
+			print u"MysqlShowTable: base MySQL ouverte"
+			cur = db.cursor() 
+			# execute la requete
+			cur.execute(requeteSQL)
+			print u"MysqlShowTable: ...execute"
+			db.commit()
+		except Exception:
+			print u"MysqlShowTable: Erreur avec la Requête= " + requeteSQL
+			print u"MysqlShowTable: ...Retour etat précédant de la base"
+			db.rollback()
+		else:
+			print u"MysqlShowTable: Requête éxecutée avec:"
+			print requeteSQL
+			#MsgLog(self, requeteSQL)
+			# efface la liste
+			gSQLlisteTable[:] = []
+			# lecture résultat
+			for row in cur.fetchall() :
+				print row[0]
+				gSQLlisteTable.append(row[0])   
+			db.close()
+			print u"MysqlShowTable: base fermée. Fin"
 
 
 
@@ -1400,30 +1609,43 @@ app = wx.App(False)
 screenHome = screenMain(None)
 # scan port serie dispo:
 #FindCOM()
-compteurGbl 	= 0
-erreurGbl		= False
-erreurBlinkGbl 	= False
-runBlinkGbl		= False
-enableBlinkGbl	= True
-enableErrBlinkGbl= True
+compteurGbl 				= 0
+erreurGbl					= False
+erreurBlinkGbl 				= False
+runBlinkGbl					= False
+enableBlinkGbl				= True
+enableErrBlinkGbl			= True
 bmpCirculaireIndexGbl=1
 # init zones de status appli
-AppliTitreGbl 	= "Serial SQL Logger"
-ProfileNameGbl	= "Aucun"
-COMselectGbl  	= "Non select."
-COMvitesseGbl 	= 115200
-statusRunStopGbl= 0
-gDataToSQL		= 0
-
-gSerialLog      = ""
-gExtractHorodatageChk	  = False
-gExtractCategorieChk	  = False
-gExtractCategorieTxt	  = ""
-gExtractNivDetailChk		  = False
-gExtractNivDetailNum		  = 1
-gCaractereSeparateurTxt	  = ""
-gCaractereSeparateurEnable= False
-
+AppliTitreGbl 				= "Serial SQL Logger"
+ProfileNameGbl				= "Aucun"
+COMselectGbl  				= "Non select."
+COMvitesseGbl 				= 115200
+statusRunStopGbl			= 0
+# encodage
+gDecodeSerieTxt		 		= "cp1252"
+gDecodeSerieWin1252Chk		= True
+gEncodeSqlTxt		 		= "utf_8"
+gEncodeSqlUTF8Chk			= True
+# SQL
+gSQLserver					= "localhost"
+gSQLuser					= "root"
+gSQLpasswd  				= ""
+gSQLdataTable				= ""
+gSQLdataBase				= "serial_sql_logger_data"
+gSQLenable					= 0
+gSQLcompleteLine			= ""
+gExtractHorodatageChk		= False
+gExtractCategorieChk		= False
+gExtractCategorieTxt		= ""
+gExtractNivDetailChk		= False
+gExtractNivDetailNum		= 1
+gCaractereSeparateurTxt		= ""
+gCaractereSeparateurEnable	= False
+gSQLlisteTable = []			# liste vide
+print 'type gSQLlisteTable:'
+print type(gSQLlisteTable)
+# init ligne status dans GUI
 screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
 screenHome.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
 screenHome.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")

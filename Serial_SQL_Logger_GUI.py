@@ -131,6 +131,41 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_menubar1.Append( self.m_systemeMnu, u"Système" ) 
 		
+		self.m_encodage = wx.Menu()
+		self.m_decodeSerial = wx.Menu()
+		self.m_decodeUTF8Mnu = wx.MenuItem( self.m_decodeSerial, wx.ID_ANY, u"UTF-8 (Unicode )", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_decodeSerial.AppendItem( self.m_decodeUTF8Mnu )
+		
+		self.m_decodeWin1252Mnu = wx.MenuItem( self.m_decodeSerial, wx.ID_ANY, u"cp1252 (Windows ,Western)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_decodeSerial.AppendItem( self.m_decodeWin1252Mnu )
+		self.m_decodeWin1252Mnu.Check( True )
+		
+		self.m_decodeCP850Mnu = wx.MenuItem( self.m_decodeSerial, wx.ID_ANY, u"cp850 (MS-DOS )", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_decodeSerial.AppendItem( self.m_decodeCP850Mnu )
+		
+		self.m_decodeISO_8859_15Mnu = wx.MenuItem( self.m_decodeSerial, wx.ID_ANY, u"ISO-8859-15 (Latin-1, West Europe,Touche Euro)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_decodeSerial.AppendItem( self.m_decodeISO_8859_15Mnu )
+		
+		self.m_encodage.AppendSubMenu( self.m_decodeSerial, u"Entrée série" )
+		
+		self.m_encodeSQL = wx.Menu()
+		self.m_encodeUTF8Mnu = wx.MenuItem( self.m_encodeSQL, wx.ID_ANY, u"UTF-8 (Unicode)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeSQL.AppendItem( self.m_encodeUTF8Mnu )
+		self.m_encodeUTF8Mnu.Check( True )
+		
+		self.m_encodeWin1252Mnu = wx.MenuItem( self.m_encodeSQL, wx.ID_ANY, u"cp1252 (Windows ,Western)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeSQL.AppendItem( self.m_encodeWin1252Mnu )
+		
+		self.m_encodeISO_8859_15Mnu = wx.MenuItem( self.m_encodeSQL, wx.ID_ANY, u"ISO-8859-15 (Latin-1, West Europe,Touche Euro)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeSQL.AppendItem( self.m_encodeISO_8859_15Mnu )
+		
+		self.m_encodeCP850Mnu = wx.MenuItem( self.m_encodeSQL, wx.ID_ANY, u"cp850 (MS-DOS )", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeSQL.AppendItem( self.m_encodeCP850Mnu )
+		
+		self.m_encodage.AppendSubMenu( self.m_encodeSQL, u"Sortie SQL" )
+		
+		self.m_menubar1.Append( self.m_encodage, u"Encodage" ) 
+		
 		self.m_serveur = wx.Menu()
 		self.m_menubar1.Append( self.m_serveur, u"Serveur" ) 
 		
@@ -325,7 +360,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_bitmap41 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_toolBar1.AddControl( self.m_bitmap41 )
 		m_tableArchiveCbxChoices = []
-		self.m_tableArchiveCbx = wx.ComboBox( self.m_toolBar1, wx.ID_ANY, u"Hacklab", wx.DefaultPosition, wx.DefaultSize, m_tableArchiveCbxChoices, 0 )
+		self.m_tableArchiveCbx = wx.ComboBox( self.m_toolBar1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_tableArchiveCbxChoices, 0 )
 		self.m_toolBar1.AddControl( self.m_tableArchiveCbx )
 		self.m_bitmap8 = wx.StaticBitmap( self.m_toolBar1, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_200x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_bitmap8.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
@@ -364,6 +399,14 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_2400mnuEvt, id = self.m_2400mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_1200mnuEvt, id = self.m_1200mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_gestPeriphMnuEvt, id = self.m_gestPeriphMnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_decodeUTF8MnuEvt, id = self.m_decodeUTF8Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_decodeWin1252MnuEvt, id = self.m_decodeWin1252Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_decodeCP850MnuEvt, id = self.m_decodeCP850Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_decodeISO_8859_15MnuEvt, id = self.m_decodeISO_8859_15Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeUTF8MnuEvt, id = self.m_encodeUTF8Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeWin1252MnuEvt, id = self.m_encodeWin1252Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeISO_8859_15MnuEvt, id = self.m_encodeISO_8859_15Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeCP850MnuEvt, id = self.m_encodeCP850Mnu.GetId() )
 		self.m_separateurCbx.Bind( wx.EVT_COMBOBOX, self.m_separateurCbxEvt )
 		self.m_separateurCbx.Bind( wx.EVT_TEXT, self.m_separateurCbxOnText )
 		self.m_separateurCbx.Bind( wx.EVT_TEXT_ENTER, self.m_separateurCbxOnTextEnter )
@@ -382,6 +425,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_portComCbx.Bind( wx.EVT_TEXT_ENTER, self.m_portComCbxEvtOnTextEnter )
 		self.Bind( wx.EVT_TOOL, self.m_RunStopToolEvt, id = self.m_RunStopTool.GetId() )
 		self.Bind( wx.EVT_TOOL, self.m_dataToolEvt, id = self.m_dataTool.GetId() )
+		self.m_tableArchiveCbx.Bind( wx.EVT_COMBOBOX, self.m_tableArchiveCbxEvt )
 		self.Bind( wx.EVT_TOOL, self.m_toolQuiterEvt, id = self.m_toolQuiter.GetId() )
 	
 	def __del__( self ):
@@ -452,6 +496,30 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_gestPeriphMnuEvt( self, event ):
 		event.Skip()
 	
+	def m_decodeUTF8MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_decodeWin1252MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_decodeCP850MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_decodeISO_8859_15MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeUTF8MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeWin1252MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeISO_8859_15MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeCP850MnuEvt( self, event ):
+		event.Skip()
+	
 	def m_separateurCbxEvt( self, event ):
 		event.Skip()
 	
@@ -504,6 +572,9 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		event.Skip()
 	
 	def m_dataToolEvt( self, event ):
+		event.Skip()
+	
+	def m_tableArchiveCbxEvt( self, event ):
 		event.Skip()
 	
 	def m_toolQuiterEvt( self, event ):
