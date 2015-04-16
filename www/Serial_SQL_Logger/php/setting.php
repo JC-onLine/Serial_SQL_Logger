@@ -5,6 +5,9 @@
 #
 # Dépendance:	base MySQL 'serial_sql_logger_setting'
 # 2015-02-15:	Creation
+# 2015-03-22:	Lecture/écriture réglages colonne SQL
+# 2015-03-23:	Suppression 'echo' pour afficher html5
+#				Ajout lecture/ecriture base SQL keyword color
 #
 #-->
 <!DOCTYPE html>
@@ -15,8 +18,16 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Serial SQL Logger</title>
 	</head>
+	<style>
+		body{
+			background:			#2E3436; 
+			color:				#A0D400; 
+		}
+	</style>
 	<body>
 		<?php
+			// définition des constantes:
+			$KEYWORD_MAXI = 10;
 			// init var
 			$currentArchive  = "";
 			$currentCategory = "";
@@ -127,10 +138,70 @@
 				$qid = $cnxData->prepare($sqlQuery);
 				// execute la requête
 				$qid->execute();
+				//echo 'setting.php: update marker ok';
 			}
+			// ==== UPDATE COLUMN SIZE ====
+			// ============================
+			if ((array_key_exists('setting',$_POST)) && ($_POST['setting'] == 'SetColSize')){
+				echo '<p>ok pour mise à jour des colonnes...</p>';
+				echo 'col-value1='.$_POST["col-value1"].'<br /><br />';
+				var_dump($_POST);
+				// composition requête SQL
+				$sqlQuery = "UPDATE `size` SET ";
+				for ($i=1; $i<15; $i++){
+					$sqlQuery = $sqlQuery."sizeCol".$i."=".$_POST["col-value".$i].", ";
+					
+				}
+				$sqlQuery = $sqlQuery."sizeCol".$i."=".$_POST["col-value".$i];
+				$sqlQuery = $sqlQuery." WHERE id=1;";
+				echo '$sqlQuery='.$sqlQuery;
+				// préparation de la transaction
+				$qid = $cnxSetting->prepare($sqlQuery);
+				// execute la requête
+				$qid->execute();
+				//echo 'setting.php: update sizeColxx ok';
+			}
+			
+			// ==== UPDATE KEYWORD COLOR ====
+			// ==============================
+			if ((array_key_exists('setting',$_POST)) && ($_POST['setting'] == 'SetKeywordColor')){
+				echo '<p>ok pour mise à jour des mots clés et couleurs...</p>';
+				var_dump($_POST);
+				// composition requête SQL
+				$sqlQuery = "UPDATE `keyword_color` SET ";
+				for ($i=1; $i<=$KEYWORD_MAXI - 1; $i++){
+					// gestion case à cocher = 'null' ou 'On'
+					if (!isset($_POST["keywordCheck".$i])){
+						$_POST["keywordCheck".$i] = '';
+					}
+					else{
+						$_POST["keywordCheck".$i] = 'checked';
+					}
+					$sqlQuery = $sqlQuery. 
+									"keywordCheck".$i."='".$_POST["keywordCheck".$i]. "', ".
+									"keywordValue".$i."='".$_POST["keywordValue".$i]. "', ".
+									"keywordColor".$i."='".$_POST["keywordColor".$i]. "', ";
+				}
+				// derniere ligne sans virgule en fin de ligne:
+				$i = $KEYWORD_MAXI;
+				$sqlQuery = $sqlQuery. 
+									"keywordCheck".$i."='".$_POST["keywordCheck".$i]. "', ".
+									"keywordValue".$i."='".$_POST["keywordValue".$i]. "', ".
+									"keywordColor".$i."='".$_POST["keywordColor".$i]. "' ";
+									"WHERE keywordProfileName='Bacacier07';";
+					echo '$sqlQuery= '.$sqlQuery.'<br />';
+				// préparation de la transaction
+				$qid = $cnxSetting->prepare($sqlQuery);
+				// execute la requête
+				$qid->execute();
+				echo 'setting.php: update keyword color ok';
+			}
+			
 			//dirige le chargement vers page d'accueil 
 			header('Location: ../serial_sql_logger.php');
 		?>
 	</body>
 </html>
+
+
 

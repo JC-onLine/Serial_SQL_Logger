@@ -1,0 +1,204 @@
+/********************************************
+*				DASHBOARD					*
+********************************************/
+ 
+/* Menu navbar*/
+.dashboard-icon{
+	margin-right:		20px;
+	font-size:			20px;		
+}
+
+nav{
+	display:			inline-block;
+	position:			absolute;
+	top:				52px;
+	left:				0;
+	bottom:				30px;
+	width:				230px;
+	background:			#11304B;
+	background:			#194365;
+//	background:			#476387;
+}
+
+.navdash{
+	position:			absolute;
+	top:				15px;
+	left:				10px;
+	bottom:				30px;
+	width:				210px;
+	background:			#11304B;
+	background:			#194365;
+//	background:			#476387;
+}
+.icon-dashboard{
+	font-size:			18px;	
+	margin-right:		10px;	
+}
+.icon-button{
+//	font-size:			15px;	
+	margin-right:		10px;	
+}
+
+section{
+	display:			inline-block;
+	position:			absolute;
+	top:				52px;
+	left:				230px;
+	padding-left:		20px;
+    right:				0;
+	bottom:				30px;
+	background:			#090A0C;
+	background:			#2E3436;
+	color:				#CDCFD1;
+}
+
+footer{
+	position:			absolute;
+	bottom:				0;
+	right:				0;
+	left:				0;
+	padding-left:		30;
+	height:				30px;
+	line-height:		30px;
+	background:			#101001;
+	color:				#505050;
+}
+
+/********************************************
+*		DASHBOARD KEYWORD COLOR				*
+********************************************/
+.profilelist{
+	display:			inline-block;
+}
+.profilevalue{
+	width:				350px;
+}
+td{
+	border:				5px solid #2E3436;
+}
+.colorId{
+	width:				50px;
+	text-align:			center;
+}
+.colorCheck{
+	background:			#FFFFFF;
+	color:				#000000;
+	font-size:			22px;		
+	width:				50px;
+	text-align:			center;
+}
+.colorKey{
+	width:				350px;
+}
+.colorCode{
+	width:				110px;
+}
+.spacer{
+	height:				50px;
+	width:				400px;
+//	background:			#375a7f;
+}
+.palette{
+	margin-left:		7px;
+	margin-right:		7px;
+	border:				1px solid #000000;
+	border-collapse	:	collapse;
+}
+.td-palette{
+	border:				1px solid #000000;
+	height:				30px;
+	width:				50px;
+    text-align:         center;
+    line-height:        2.5em;
+    vertical-align:     middle;
+    cursor: 			pointer;
+}
+/* palette: Surlignage souris */
+.td-palette:hover{
+	border:				1px solid #FFFFFF;
+//	color:				#FFFFFF;
+}
+
+/*
+.palette-color1{
+//	background:			#FF0000;
+//	color:				#000000;
+}
+.palette-color2{
+	background:			#808000;
+	color:				#000000;
+}
+.palette-color3{
+	background:			#FFFF00;
+	color:				#000000;
+}
+.palette-color4{
+	background:			#008000;
+	color:				#000000;
+}
+.palette-color5{
+	background:			#00FF00;
+	color:				#000000;
+}
+.palette-color6{
+	background:			#008080;
+	color:				#000000;
+}
+.palette-color7{
+	background:			#00FFFF;
+	color:				#000000;
+}
+.palette-color8{
+	background:			#0000FF;
+	color:				#000000;
+}
+.palette-color9{
+	background:			#800080;
+	color:				#000000;
+}
+.palette-color10{
+	background:			#FF00FF;
+	color:				#000000;
+}
+.palette-color11{
+	background:			#2B0000;
+	color:				#000000;
+}
+.palette-color12{
+	background:			#800000;
+	color:				#000000;
+}
+.palette-color13{
+	background:			#666666;
+	color:				#000000;
+}
+.palette-color14{
+	background:			#999999;
+	color:				#000000;
+}
+.palette-color15{
+	background:			#CCCCCC;
+	color:				#000000;
+}
+.palette-color16{
+	background:			#FFFFFF;
+	color:				#000000;
+}
+*/
+
+/********************************************
+*		DASHBOARD COLUMN SIZE				*
+********************************************/
+.td-col-value{
+	width:				50px;
+	text-align:			right;
+	background:			#CFD5D7;
+	color:				#000000;
+}
+.td-col-slider{
+	width:				300px;
+	margin-left:		20px;
+}
+
+
+

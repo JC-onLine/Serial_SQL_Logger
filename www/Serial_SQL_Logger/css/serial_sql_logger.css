@@ -1,0 +1,126 @@
+/********************************************
+*				DASHBOARD					*
+********************************************/
+ 
+/* Menu navbar*/
+.dashboard-icon{
+	margin-right:		20px;
+	font-size:			20px;		
+}
+
+nav{
+	display:			inline-block;
+	position:			absolute;
+	top:				52px;
+	left:				0;
+	bottom:				30px;
+	width:				230px;
+	background:			#11304B;
+}
+
+.navdash{
+	position:			absolute;
+	top:				15px;
+	left:				10px;
+	bottom:				30px;
+	width:				210px;
+	background:			#11304B;
+}
+
+section{
+	display:			inline-block;
+	position:			absolute;
+	top:				52px;
+	left:				230px;
+	padding-left:		20px;
+    right:				0;
+	bottom:				30px;
+//	background:			#090A0C;
+	color:				#CDCFD1;
+}
+
+footer{
+	position:			absolute;
+	bottom:				0;
+	right:				0;
+	left:				0;
+	padding-left:		30;
+	height:				30px;
+	line-height:		30px;
+	background:			#101001;
+	color:				#505050;
+}
+
+/********************************************
+*				 TABLEAU					*
+********************************************/
+ 
+table	 {
+    table-layout:		fixed;
+}
+
+/* Conteneur du tableau: hauteur, couleurs */
+.div-table-content {
+	height:				820px;
+	overflow-y:			auto;
+	background-color:	#AAAAAA; 
+	color:				#222222; */
+}
+
+/* En-tête grille: Police caractère et couleurs */
+.table-header{
+	margin-top:			-1px;
+/*	border			:	2px solid white; */
+	border-collapse	:	collapse;
+    height:			    30px;
+    line-height:        2.2em;
+	font-family:		Verdana,Arial,Sans;
+	font-size:			12px;		
+	background-color:	#375a7f;
+	color:				#EEEEEE;
+}
+
+/* Largeur des colonnes */
+
+th.col1, td.col1 {
+/*	width:				30px;	*/
+	text-align:			center;
+	color:				#375a7f;
+}
+th.col2, td.col2 {
+/*	width:				150px;	*/
+}
+th.col3, td.col3 {
+/*	width:				100px;	*/
+}
+th.col4, td.col4 {
+/*	width:				60px;	*/
+}
+
+/* Grille: Surlignage souris */
+tr.trData:hover{
+/*	background-color:	#1A1A1A;*/
+	background-color:	#A0A0A0;
+}
+
+/* Grille: marker */
+td.markerOn{
+	background-color:	#D0FF00;
+}
+
+/********************************************
+*				DASHBOARD CLE				*
+********************************************/
+td{
+	border:				15px;
+}
+.colorId{
+	width:				50px;
+	text-align:			center;
+}
+.colorKey{
+	width:				200px;
+}
+.colorCode{
+	width:				130px;
+}

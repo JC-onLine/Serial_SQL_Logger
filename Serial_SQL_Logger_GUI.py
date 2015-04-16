@@ -164,9 +164,27 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_encodage.AppendSubMenu( self.m_encodeSQL, u"Sortie SQL" )
 		
+		self.m_encodeGUI = wx.Menu()
+		self.m_encodeGuiUTF8Mnu = wx.MenuItem( self.m_encodeGUI, wx.ID_ANY, u"UTF-8 (Unicode )", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeGUI.AppendItem( self.m_encodeGuiUTF8Mnu )
+		
+		self.m_encodeGuiWin1252Mnu = wx.MenuItem( self.m_encodeGUI, wx.ID_ANY, u"cp1252 (Windows ,Western)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeGUI.AppendItem( self.m_encodeGuiWin1252Mnu )
+		
+		self.m_encodeGuiISO_8859_15Mnu = wx.MenuItem( self.m_encodeGUI, wx.ID_ANY, u"ISO-8859-15 (Latin-1, West Europe,Touche Euro)", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeGUI.AppendItem( self.m_encodeGuiISO_8859_15Mnu )
+		
+		self.m_encodeGuiCP850Mnu = wx.MenuItem( self.m_encodeGUI, wx.ID_ANY, u"cp850 (MS-DOS )", wx.EmptyString, wx.ITEM_RADIO )
+		self.m_encodeGUI.AppendItem( self.m_encodeGuiCP850Mnu )
+		
+		self.m_encodage.AppendSubMenu( self.m_encodeGUI, u"Sortie GUI" )
+		
 		self.m_menubar1.Append( self.m_encodage, u"Encodage" ) 
 		
 		self.m_serveur = wx.Menu()
+		self.m_mysqlInsert = wx.MenuItem( self.m_serveur, wx.ID_ANY, u"Test MySQL", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_serveur.AppendItem( self.m_mysqlInsert )
+		
 		self.m_menubar1.Append( self.m_serveur, u"Serveur" ) 
 		
 		self.SetMenuBar( self.m_menubar1 )
@@ -234,7 +252,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_ExtractNivDetailChk = wx.CheckBox( self, wx.ID_ANY, u"Niveau détail\ninclus dans logs", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
 		bSizer31.Add( self.m_ExtractNivDetailChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		bSizer7 = wx.BoxSizer( wx.VERTICAL )
+		bSizer7 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.m_ExtractNivDetailLbl = wx.StaticText( self, wx.ID_ANY, u"Ajout num\ndétail", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_ExtractNivDetailLbl.Wrap( -1 )
@@ -260,57 +278,72 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		bSizer3.SetMinSize( wx.Size( -1,32 ) ) 
-		self.m_statusActionTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusActionTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 250,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
 		self.m_statusActionTextStat.Wrap( -1 )
 		self.m_statusActionTextStat.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
 		
-		bSizer3.Add( self.m_statusActionTextStat, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
+		bSizer3.Add( self.m_statusActionTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusComTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusComTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
 		self.m_statusComTextStat.Wrap( -1 )
 		self.m_statusComTextStat.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
 		
-		bSizer3.Add( self.m_statusComTextStat, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
+		bSizer3.Add( self.m_statusComTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 150,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 110,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
 		self.m_statusVitesseTextStat.Wrap( -1 )
 		self.m_statusVitesseTextStat.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
 		
-		bSizer3.Add( self.m_statusVitesseTextStat, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
+		bSizer3.Add( self.m_statusVitesseTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
+		
+		self.m_statusDecodeSerieTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusDecodeSerieTxt.Wrap( -1 )
+		self.m_statusDecodeSerieTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		
+		bSizer3.Add( self.m_statusDecodeSerieTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
+		
+		self.m_statusEncodeSqlTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusEncodeSqlTxt.Wrap( -1 )
+		self.m_statusEncodeSqlTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		
+		bSizer3.Add( self.m_statusEncodeSqlTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
+		
+		self.m_statusEncodeGuiTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusEncodeGuiTxt.Wrap( -1 )
+		self.m_statusEncodeGuiTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		
+		bSizer3.Add( self.m_statusEncodeGuiTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
 		
 		bSizer3.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_btn_mysqlInsert = wx.Button( self, wx.ID_ANY, u"MySQL INSERT", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer3.Add( self.m_btn_mysqlInsert, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_OsTxt = wx.StaticText( self, wx.ID_ANY, u"OS :", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_OsTxt.Wrap( -1 )
-		bSizer3.Add( self.m_OsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
-		
-		self.m_bmpOS = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer3.Add( self.m_bmpOS, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.RIGHT|wx.LEFT, 5 )
-		
-		self.m_OSdetailsTxt = wx.StaticText( self, wx.ID_ANY, u"details", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_OSdetailsTxt.Wrap( -1 )
-		bSizer3.Add( self.m_OSdetailsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
-		
-		self.m_ArchBitsTxt = wx.StaticText( self, wx.ID_ANY, u"xx bits", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_ArchBitsTxt.Wrap( -1 )
-		bSizer3.Add( self.m_ArchBitsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
-		
 		
 		bSizer1.Add( bSizer3, 0, wx.EXPAND, 5 )
 		
-		bSizer4 = wx.BoxSizer( wx.VERTICAL )
+		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,100 ), wx.TE_MULTILINE )
+		self.logAppliTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 500,100 ), wx.TE_MULTILINE )
 		self.logAppliTextCtrl.SetForegroundColour( wx.Colour( 207, 207, 207 ) )
 		self.logAppliTextCtrl.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
 		self.logAppliTextCtrl.SetMinSize( wx.Size( -1,80 ) )
 		self.logAppliTextCtrl.SetMaxSize( wx.Size( -1,80 ) )
 		
-		bSizer4.Add( self.logAppliTextCtrl, 0, wx.EXPAND|wx.ALL, 5 )
+		bSizer4.Add( self.logAppliTextCtrl, 1, wx.ALL, 5 )
+		
+		self.m_OsTxt = wx.StaticText( self, wx.ID_ANY, u"OS :", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_OsTxt.Wrap( -1 )
+		bSizer4.Add( self.m_OsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_bmpOS = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer4.Add( self.m_bmpOS, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_OSdetailsTxt = wx.StaticText( self, wx.ID_ANY, u"details", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_OSdetailsTxt.Wrap( -1 )
+		bSizer4.Add( self.m_OSdetailsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_ArchBitsTxt = wx.StaticText( self, wx.ID_ANY, u"xx bits", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_ArchBitsTxt.Wrap( -1 )
+		bSizer4.Add( self.m_ArchBitsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
 		
 		
 		bSizer1.Add( bSizer4, 0, wx.EXPAND, 5 )
@@ -407,6 +440,11 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.m_encodeWin1252MnuEvt, id = self.m_encodeWin1252Mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_encodeISO_8859_15MnuEvt, id = self.m_encodeISO_8859_15Mnu.GetId() )
 		self.Bind( wx.EVT_MENU, self.m_encodeCP850MnuEvt, id = self.m_encodeCP850Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeGuiUTF8MnuEvt, id = self.m_encodeGuiUTF8Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeGuiWin1252MnuEvt, id = self.m_encodeGuiWin1252Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeGuiISO_8859_15MnuEvt, id = self.m_encodeGuiISO_8859_15Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_encodeGuiCP850MnuEvt, id = self.m_encodeGuiCP850Mnu.GetId() )
+		self.Bind( wx.EVT_MENU, self.m_mysqlInsertEvt, id = self.m_mysqlInsert.GetId() )
 		self.m_separateurCbx.Bind( wx.EVT_COMBOBOX, self.m_separateurCbxEvt )
 		self.m_separateurCbx.Bind( wx.EVT_TEXT, self.m_separateurCbxOnText )
 		self.m_separateurCbx.Bind( wx.EVT_TEXT_ENTER, self.m_separateurCbxOnTextEnter )
@@ -418,7 +456,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.m_ExtractNivDetailNum.Bind( wx.EVT_SPINCTRL, self.m_ExtractNivDetailNumEvt )
 		self.m_ExtractNivDetailNum.Bind( wx.EVT_TEXT, self.m_ExtractNivDetailNumEvtTxt )
 		self.m_ExtractNivDetailNum.Bind( wx.EVT_TEXT_ENTER, self.m_ExtractNivDetailNumEvtEnter )
-		self.m_btn_mysqlInsert.Bind( wx.EVT_BUTTON, self.m_btn_mysqlInsertEvt )
 		self.Bind( wx.EVT_TOOL, self.m_findPortToolEvt, id = self.m_findPortTool.GetId() )
 		self.m_portComCbx.Bind( wx.EVT_COMBOBOX, self.m_portComCbxEvt )
 		self.m_portComCbx.Bind( wx.EVT_TEXT, self.m_portComCbxEvtOnText )
@@ -520,6 +557,21 @@ class FenetrePrincipaleClass ( wx.Frame ):
 	def m_encodeCP850MnuEvt( self, event ):
 		event.Skip()
 	
+	def m_encodeGuiUTF8MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeGuiWin1252MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeGuiISO_8859_15MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_encodeGuiCP850MnuEvt( self, event ):
+		event.Skip()
+	
+	def m_mysqlInsertEvt( self, event ):
+		event.Skip()
+	
 	def m_separateurCbxEvt( self, event ):
 		event.Skip()
 	
@@ -551,9 +603,6 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		event.Skip()
 	
 	def m_ExtractNivDetailNumEvtEnter( self, event ):
-		event.Skip()
-	
-	def m_btn_mysqlInsertEvt( self, event ):
 		event.Skip()
 	
 	def m_findPortToolEvt( self, event ):
