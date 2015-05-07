@@ -1,7 +1,11 @@
+# general
 geany_run_script.bat
 Serial_SQL_Logger_project.geany
 _poubelle
 archives
+
+# dossier MySQL
+MySQL.zip
 
 # dossier www
 jquery-ui-1.11.4.custom(slider-only).zip

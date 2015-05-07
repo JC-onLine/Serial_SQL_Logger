@@ -267,7 +267,7 @@
 							// execute la requête
 							$qid->execute();
 							//dirige le chargement vers page d'accueil 
-							if ( !$DEBUG){ header('Location: serial_sql_logger.php'); }
+							//if ( !$DEBUG){ header('Location: serial_sql_logger.php'); }
 						}
 					}	// $profileNameInput != ''
 				}

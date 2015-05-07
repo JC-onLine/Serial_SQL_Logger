@@ -15,126 +15,9 @@
 #				- wxPython3.0-win64-3.0.0.0-py27.exe
 #				- wxFormBuilder_v3.4.2-beta.exe
 #
-# 2014-04-19:	Creation
-# 2014-04-20:	Ajout menu <Port COM> + activation COM dispo dans menu
-# 2014-04-21:	Ajout menu <Vitesse> + description menu status
-#			 	Remplacement status Ctrtxt par StaticText
-# 2014-04-22:	Ajout boite dialogue saisie manu port COM + err COM
-# 2014-04-24:	Ajout menu <Gestionnaire de periphérique>
-# 2014-04-24:	Ajout COM16 à COM20
-# 2014-04-26:	Ajout menu [Fichier]/<Nouveau> 
-#			 	+ mot COM dans menu [Vitesse COM]
-#				+ différenciation des commentaires [menu] et <menuItem>
-#				+ ré-indentation des commentaires du header de l'appli
-# 2014-04-26a:	Correction bug menu [Port COM]/<Séléction manuelle> en wxITEM_RADIO
-# 2014-05-04:	Ajout dev menu [Fichier] <Enregistrer>
-# 							   [Fichier] <Enregistrer sous...>
-# 							   [Fichier] <Ouvrir>
-#				Correction bug menu [Port COM]/<Actualiser> en wxITEM_RADIO
-#				Correction orthographe 'périphérique'+'Système' dans menu [Système]
-#				Mise en commentaire fonction 'ActualiserCOM()' au démarrage appli
-#	---------------------------------------------------------------------------------
-# 2014-05-11:	Fork de Serie_vers_Afficheur_Uno_MAIN.py
-#				Adaptation:
-#					suppression des boutons, slider, progressbar etc
-# 2014-05-17:	Ajout réception série dans le textCtrl (aide miniterm.py de pySerial)
-#				Ajout Led ERR rouge/gris clignotant, si erreur definition port COM
-# 2014-05-31:	Correction open-save-saveas car textCtrl nom différent
-#				wxFB changement titre fenêtre appli
-#				wxFB logTextCtrl enabled=true pour capture logs copier-coller
-#				Ajout menu Port COM21 à COM25
-#				Ajout RUN clignotant
-#				Remplacement self.logTextCtrl.Value par self.logTextCtrl.WriteText
-#				Modif self.repr_mode=1 pour gestion CRLF
-#				Ajout arrêt clignotant pendant popup open/save/saveas
-#				Essai ok: pc jc bluetooth COM20, avec VM prog08 WinCC Bac63 Ligne10 COM4
-# 2014-06-01	GUI: Ajout CtrlTxt pour zone logs appli en plus de print
-#				Ajout fonction MsgLog(self,"message") pour "logAppliTextCtrl"
-# 2014-06-15	Remplacement disableBlinkGbl par enableBlinkGbl
-# 2014-07-19	Remome wxFB nouveau/ouvrir/enreg/enreg en newLog/openLog/saveLog/saveAsLog
-#				Ajout  wxFB newProfil/openProfil/saveProfil/saveAsProfil
-# 2014-07-20	renome variable fichier en logFolderName/logFileName
-#				création gestion profile avec module ConfigParser
-# 2014-07-21	Gestion profile New/Open/Save/SaveAS
-#				Fonctions CheckCOM() CheckVitesse() pour actu selection menu depuis profile
-# 2014-07-22	Fin gestion profile conf port série, avec rappel dans titre appli
-# 2014-07-26	wxFB: redimenssionnement GUI pour CubieTruck résol. 1024x768
-#				Indication OS+architecture 32/64bits
-# 2014-07-27	Actualisation port COM dans comboBox: w7+debian=ok				
-# 2014-08-10	Création ToolBar, remplacement terme 'Actualisation port' par 'Rechercher port'
-#				Suppression menu COM1..25 fonction EnableCOM() CheckCOM()
-# 2014-09-07	Correction wxBitmapComboBox: compatibilité linux=ok
-# 2014-09-08	Ajout AppliStart/AppliStop sur bouton Play/Stop toolbar test Linux Debian=ok
-#				Etude bug graphique RUN clignotant bmp ON/OFF
-#				le bug est du à la toolbar -> Déplacement du clignotant dans la toolbar
-# 2014-09-19	Ajout de png spacer pour toolbar séparation des objets
-# 2014-09-20	Ajout test MySQL MySQLdb 64bits http://www.codegood.com/archives/129
-# 2014-09-21	Recherche MySQLdb
-# 2014-09-23	Bouton MySQL INSERT fonctionne vers base serial_sql_logger Cubietruck
-# 2014-09-24	Ajout MysqlInsert sur réception CR = ok
-# 2014-09-28	Ajout chekBox pour extraction et séparation des données
-# 2014-09-29	Ajout événements checkBox + Enable/Disable Txt et comboBox
-# 2014-10-10	Modif GUI case à cocher décodage Horodatage/Catégorie/Priorité
-# 2014-10-12	Ajout selections case à cocher dans le profile de réglage
-# 2015-02-07	Correction animation Play/Pause
-#				Ajout icone SQL on/off
-# 2015-02-08	Remplacement de l'animation loader
-# 2015-02-08	Mise en place sélection extraction Horodatage/Catégorie/NivDétail/MessageLog
-# 2015-02-12	Ajout gestion utf-8
-# 2015-02-14	PHP: Correction utf8 coté PHP MySQL -> merci WOoOinux !
-#					 $cnx->exec("set names utf8");
-# 2015-02-15	Correction de toutes les chaines caractères en utf-8. ex: u'texte'
-# 2015-02-16:	PHP: Ajout filtre catégorie: Toutes+Aucune+séparateur
-# 2015-02-17:	PHP: Suppression format bootstrap du tableau. retour custom
-# 2015-02-18:	PHP: Ajout du marqueur de ligne
-# 2015-02-23:	PHP: Ajout css 'active' dans selection en cours menu bootstrap
-# 2015-02-24:	GIT: Utilisation de Ungit pour le versioning
-# 2015-02-24:	GUI: Ajout menu encodage Entrée série/Sortie SQL
-# 2015-02-25:	Ajout table archive dispo dans liste ComboBox avec actualisation	
-#				Ajout séléction par défaut séparateur '|' si coche 'Horodadage..'
-#				Ajout logs checkBox extraction pour SQL
-# 2015-03-15:	PHP: Création page Dashboard.php: navbar nav section keyword color
-# 2015-03-16:	PHP: Dashboard.php: gestion menu color/column
-# 2015-03-17:	PHP: Dashboard.php: section column size
-# 2015-03-18:	PHP/JS: Dashboard.php: section column size ajout slider x15
-# 2015-03-23:	Suppression 'echo' pour afficher html5
-#				Ajout lecture/ecriture base SQL keyword color
-# 2015-04-01:	PHP: Dashboard.php: section coloration par mot clés
-# 2015-04-04:	Remplacement $_GET par $_POST
-# 				KeywordColor: Ajout paramètres profile via $_POST
-# 2015-04-08:	La gestion profile des mot clé est opérationnelle
-# 2015-04-12:	SQL: Suppression PRIMARY KEY sur horodatage
-#
 #####################################################################################
-# TODO:
-# [Python]
-#		[x] Ajouter menu sélection liste encodage entrée/sortie 2015-02-25
-#		[ ] Ajouter menu sélection serveur
-#		[x] Ajouter menu sélection tables disponibles 2015-02-25
-#		[x] Marquer le nom du fichier en cours dans la barre de titre appli
-#		[x] Raccourcie clavier Ctrl+N Ctrl+O Ctrl+S Ctrl+Shift+S Ctrl+Q
-#		[ ] Mettre une icônes dans la barre de titre appli
-#		[x] Voir si possible de mettre icônes dans menu Fichier/ouvrir etc
-#		[x] Detecter OS pour compatibilité Windows/Linux
-#		[x]	Gestion de profile de config COM pour utilisation différent PC
-#		[ ]	Boot appli avec le dernier profile sélectionné
-#		[ ] Faire apparaitre commentaire affect port COM ex: COM4 'Bluetooth' 
-#			-> memoriser non machine et proposer la catalogue des ports COM
-#		[ ] Ajouter zone saisie 'Terminal'
-#		[/] Ajouter animation sur bouton Play/Stop toolbar. (voir sous linux))
-#		[x] Ajouter enregistrement SQL des logs 2014-09-24
-#		[x] Ajouter logs des checkBox 2015-02-25
-#		[x] Ajouter dossier 'Progile' pour enregistrement des Profile
-#		[x] Ajouter dossier 'Logs' pour enregistrement des Logs provenant port série
-# [PHP]
-#		[ ] Ajouter filtre par Niv détails
-#		[x] Céer page dashboard: 
-#		[x] -> réglages largeurs colonnes du tableau
-#		[x] -> surlignage des mots clés avec leur couleur.
-#		[x] -> icone dashboard: ion-gear-b
-#		[ ] 
-#	"+" = Addition, "*" = Bug Fix, "-" = Removed, "~" = Move, "^" = Updated
-#####################################################################################
+
+#HIGH LOW INPUT INPUT_PULLUP OUTPUT DEC BIN HEX OCT bitRead bitWrite bitSet bitClear bit highByte lowByte analogReference analogRead analogWrite attachInterrupt detachInterrupt delay delayMicroseconds digitalWrite digitalRead interrupts millis micros noInterrupts noTone pinMode pulseIn shiftIn shiftOut tone yield Serial Serial1 Serial2 Serial3 SerialUSB begin end peek read print println available availableForWrite flush setTimeout find findUntil parseInt parseFloat readBytes readBytesUntil readString readStringUntil trim toUpperCase toLowerCase charAt compareTo concat endsWith startsWith equals equalsIgnoreCase getBytes indexOf lastIndexOf length replace setCharAt substring toCharArray toInt Keyboard Mouse press release releaseAll accept click move isPressed setup loop drawLine UTFT UTouch DueGUI InitTouch InitGUI UTouch SPI_Flash_init InitLCD clrScr fillScr setColorLong setBackColorLong setColor setBackColor drawPixel drawLine drawRect drawRoundRect fillRect fillRoundRect drawCircle fillCircle print printNumI printNumF setFont drawBitmap lcdOff lcdOn setContrast getDisplayXSize getDisplayYSize preserveColours restoreColours updatingScreen finishedUpdatingScreen withinBounds displayNumFormat calculate_x calculate_y drawAngledLine startTimer stopTimer restartTimer addButton addTextInput drawTextInputText drawTextInput updateTextInput addCheckBox drawCheckBox addCycleButton drawCycleButton drawButton checkButton checkAllButtons addPanel drawPanel addLabel drawLabel addShape drawShape addImage drawImage addAnalogueClock drawAnalogueClock addDigitalClock_Time drawDigitalClock_Time addDigitalClock_Date drawDigitalClock_Date drawHands drawAnalogueClock_dividers setObjectTime setObjectDate clearAllObjects redrawAllObjects redrawChangedObjects redrawObject clearRectObject makeObjectInvisible makeObjectVisible DueGUI_tickHandler KEYWORD2 clearObjectArea objectVisible drawSingleKey makePopUp clearPopUp returnBoolValue  returnIntValue returnStringValue findObjectByURN HandleShowButtons HandleShowLoop showCalibrate CTE50 CTE70 shutdown setScanLimit setIntensity clearDisplay setLed setRow setColumn setDigit setChar
 
 from __future__ import unicode_literals
 # importation la librairie wxWidget
@@ -143,6 +26,7 @@ import wx
 import Serial_SQL_Logger_GUI
 # acces à la librairie du port série
 import serial
+import glob
 # acces à la librairie de la gestion du temps
 from time import sleep
 # acces fonctions systeme
@@ -207,10 +91,26 @@ NEWLINE_CONVERISON_MAP = (LF, CR, CRLF)
 LF_MODES = ('LF', 'CR', 'CR/LF')
 
 
+# Gestion réception reprise de l'exemple wxTerminal.py de pyserial
+# création événement 
+#----------------------------------------------------------------------
+# Create an own event type, so that GUI updates can be delegated
+# this is required as on some platforms only the main thread can
+# access the GUI without crashing. wxMutexGuiEnter/wxMutexGuiLeave
+# could be used too, but an event is more elegant.
+SERIALRX = wx.NewEventType()
+# affecte l'événement à la réception du port série
+EVT_SERIALRX = wx.PyEventBinder(SERIALRX, 0)
+
+class SerialRxEvent(wx.PyCommandEvent):
+	eventType = SERIALRX
+	def __init__(self, windowID, data):
+		wx.PyCommandEvent.__init__(self, self.eventType, windowID)
+		self.data = data
+
 class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	# constructor
 	def __init__(self,parent):
-		#self.Bind( wx.PyEventBinder(SERIALRX, 0), self.OnSerialRead)
 		# initialize parent class
 		Serial_SQL_Logger_GUI.FenetrePrincipaleClass.__init__(self,parent)
 		# création objet portSerie depuis class Srérial de lib pySerial
@@ -270,20 +170,41 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			self.m_bmpOS.SetBitmap(self.imageOsLinux)
 			self.m_OSdetailsTxt.SetLabel(g_OSdistrib)
 			MsgLog(self, u"Systeme d'exploitation: " + g_OSname+'  '+g_OSdistrib+'  '+g_architectBits)
+			MsgLog(self, u"Python version: " + str(sys.version_info[0])+"."+str(sys.version_info[1])+str(sys.version_info[2])+" "+str(sys.version_info[3]))
 			self.m_gestPeriphMnu.Enable(False)
 		else:
 			self.m_bmpOS.SetBitmap(self.imageOsWindows)
 			self.m_OSdetailsTxt.SetLabel(g_OSname+' '+g_OSversion)
 			MsgLog(self, u"Systeme d'exploitation: " + g_OSname+'  '+g_OSversion+'  '+g_architectBits)
 		self.m_ArchBitsTxt.SetLabel(g_architectBits)
+		# affichage version python
+		self.m_PyVersionTxt.SetLabel(str(sys.version_info[0])+"."+str(sys.version_info[1])+str(sys.version_info[2])+" "+str(sys.version_info[3]))
 		# ListBox Caractères séparateurs de données
 		self.m_separateurCbx.Clear()
 		self.m_separateurCbx.Append("|")
 		self.m_separateurCbx.Append(";")
 		self.m_separateurCbx.Append("*")
 		self.m_separateurCbx.Append("TAB")
-			
-		
+		# liaison événement pour réception du port série (cf exemple pyserial)
+		self.Bind(EVT_SERIALRX, self.OnSerialRead)
+	
+	#####################################################
+	# 					Fonction OnSerialRead(self, event)
+	# Principe	:	Evénement de rafraichissement wxTextCtrl
+	# Dépandence:	screenMain constructor
+	# Appelé par:	Tâche de réception série
+	# 2015-05-06:	Création
+	#####################################################
+	def OnSerialRead(self, event):
+		"""Handle input from the serial port."""
+		text = event.data
+		self.logTextCtrl.AppendText(text)
+
+
+	#####################################################
+	# 			CAPTURE EVENEMENTS wxWidgets
+	#####################################################
+	
 	# capture de l'événement m_timer1
 	def m_timer1Evt(self,event):
 		global compteurGbl
@@ -348,7 +269,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			bmpCirculaireIndexGbl=bmpCirculaireIndexGbl+1
 			if bmpCirculaireIndexGbl > 12:
 				bmpCirculaireIndexGbl = 1
-
 
 	# capture de l'événement clic 'RUN'
 	def m_bntRunEvt(self,event):
@@ -539,7 +459,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# STOP si port série déjà ouvert
 		if self.portSerie.isOpen(): 
 			# Arrêt de la scrutation réception série
-			if self.alive and self._reader_alive:
+			if self.alive:
 				print(u'Arrêt de la scrutation réception série.')
 				MsgLog(self, u'Arret de la scrutation reception serie ' + COMselectGbl)
 				self._stop_reader()
@@ -570,7 +490,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def _start_reader(self):
 		"""Start reader thread"""
 		self.alive = True
-		self._reader_alive = True
 		# start serial->console thread
 		self.receiver_thread = threading.Thread(target=self.reader)
 		self.receiver_thread.setDaemon(True)
@@ -581,7 +500,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		"""Stop reader thread only, wait for clean exit of thread"""
 		self.receiver_thread._Thread__stop()
 		self.alive = False
-		self._reader_alive = False
 		self.receiver_thread.join()
 
 
@@ -592,24 +510,29 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global gEncodeSqlTxt
 		global gSQLcompleteLineTxt
 		# la liste texte est: logTextCtrl.Value = ""
-		try:
-			while self.alive and self._reader_alive:
-				#desactive le RUN/STOP clignotant pour optimiser la réception
-				enableBlinkGbl = False
-				# lecture du port série, décodage à la voléeselon selection menu 'encodage / entrée série'
-				##serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
-				serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
+		while self.alive:
+			#desactive le RUN/STOP clignotant pour optimiser la réception
+			enableBlinkGbl = False
+			# lecture du port série, décodage à la voléeselon selection menu 'encodage / entrée série'
+			##serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
+			##serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
+			try:
+#				serialData = character(self.portSerie.read(1))
+				serialData = self.portSerie.read(1)
 				# caractère reçu ?
-				if (serialData != ""):
+				if serialData:
 					# Filtrage des guillemets à cause de SQL
 					if ((serialData == "'") or (serialData == '"') or (serialData == '\n')):
 						serialData = ""
+					serialDataInWaiting= self.portSerie.inWaiting()     #regarde s'il y a encore des données à lire
+#					if serialDataInWaiting:
+#						serialData = serialData + self.portSerie.read(serialDataInWaiting) #Lit les caractères en attente
 					# affichage caractère dans GUI
-					print type(serialData)
+					#print type(serialData)
 					#print "serialData: " + type(serialData)
-					pourAffichage = serialData.encode(gEncodeGuiTxt, errors='replace')
-					##print "pourAffichage: " + type(pourAffichage)
-					self.logTextCtrl.WriteText(pourAffichage)
+					#pourAffichage = serialData.encode(gEncodeGuiTxt, errors='replace')
+					event = SerialRxEvent(self.GetId(), serialData)
+					self.GetEventHandler().AddPendingEvent(event)
 					# si reception CR et SQL actif on doit enregistrer dans SQL
 					if ((serialData == '\r') and gSQLenable):
 						# enregistrement données reçu du port série en SQL
@@ -622,11 +545,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 						if gSQLenable:
 ##							gSQLcompleteLineTxt = gSQLcompleteLineTxt + serialData.encode(gEncodeSqlTxt, errors='replace')
 							gSQLcompleteLineTxt = gSQLcompleteLineTxt + serialData
-		except serial.SerialException, e:
-			self.alive = False
-			MsgLog(self, u'Erreur de traitement de la reception')
-			raise
-
+			except serial.SerialException, e:
+				self.alive = False
+				MsgLog(self, u'Erreur de traitement de la reception')
+				raise
 
 	
 	######## MENU [Fichier] ########
@@ -634,7 +556,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_LogNewMnuEvt(self,event):
 		print(u"Menu: Nouveau: Effacement des Logs")
 		MsgLog(self, u'Fichier Nouveau: Effacement des Logs')
-		self.logTextCtrl.Value = ""
+		self.logTextCtrl.Clear()
 	# capture de l'événement selection menu <LogOpen>
 	def m_LogOpenMnuEvt(self,event):
 		global appliFolderName
@@ -917,7 +839,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		global COMselectGbl
 		# scan port serie dispo:
 		print(u"<Select.Manuel> ")
-		box = wx.TextEntryDialog(None, "Entrez le nom du port serie:\n  Exemple: COM4", "Port serie:", "COM4")
+		box = wx.TextEntryDialog(None, "Entrez le nom du port serie:\n  Exemple: /dev/ttyACM0 pour Arduino", "Port serie:", "/dev/ttyACM0")
 		if box.ShowModal()==wx.ID_OK:
 			COMselectGbl=box.GetValue()
 		print(u"Selection manuelle: "+ COMselectGbl)
@@ -951,7 +873,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_portComCbxEvtOnTextEnter( self, event ):
 		event.Skip()
 
-
 	# capture de l'événement ComboBox Port COM Validation <Enter>
 	def m_portComCbxEvtOnTextEnter( self, event ):
 		global COMselectGbl
@@ -960,7 +881,12 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		MsgLog(self, u"Selection Port COM: "+ COMselectGbl)
 		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
 		self.m_statusActionTextStat.SetLabel("Pret.")
-
+	
+		
+	####################################
+	########		MENU		########
+	####################################
+	
 	######## MENU [Vitesse COM] ########
 	# capture de l'événement selection menu <115200 bds>
 	def m_115200mnuEvt(self,event):
@@ -1203,7 +1129,11 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 	def m_mysqlInsertEvt(self,event):
 		MysqlInsert(self,"Test enregistrement")
 
-	########==== ToolBar ====########
+
+	####################################
+	########	  ToolBar		########
+	####################################
+	
 	# icone <Find Port>
 	def m_findPortToolEvt( self, event ):
 		# scan port serie dispo:
@@ -1319,7 +1249,6 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 # 2014-06-01:	Création
 #####################################################
 def MsgLog(self,message):
-	#print type(message)
 	self.logAppliTextCtrl.WriteText(u'\n' + time.strftime(u'%Y-%m-%d %H:%M:%S  ' + message))
 
 #####################################################
@@ -1337,62 +1266,72 @@ def AppliTitreCreation():
 	AppliTitreGbl = u"Serial to SQL Logger - Profile: ["+ProfileNameGbl+ u"]  Port:"+COMselectGbl+ u"  Vitesse:"+str(COMvitesseGbl)+ u" bds"
 
 #####################################################
-# 					Fonction scan()
-# Principe	:	Scan les ports COM disponibles
+# 					Fonction ScanWin()
+#					Reprise exemple lib pyserial
+# Principe	:	Scan les ports COM disponibles sous Windows
 # Dépandence:	import serial
 # Appelé par:	Fonction FindCOM()
 # 2014-04-19:	Création
 #####################################################
-def scan():
+def ScanWin():
 	"""scan for available ports. return a list of tuples (num, name)"""
 	available = []
 	for i in range(100):
 		try:
 			s = serial.Serial(i)
 			available.append( (i, s.portstr))
-			s.close()   # explicit close 'cause of delayed GC in java
+			s.close()
 		except serial.SerialException:
 			pass
 	return available
 
 #####################################################
+# 					Fonction ScanLinux()
+#					Reprise exemple lib pyserial
+# Principe	:	Scan les ports séries disponibles sous linux
+# Dépandence:	import serial glob
+# Appelé par:	Fonction FindCOM()
+# 2015-05-06	Création
+#####################################################
+def ScanLinux():
+    """scan for available ports. return a list of device names."""
+    return glob.glob('/dev/ttyACM*') + glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyS*')
+
+#####################################################
 # 					Fonction FindCOM()
-# Principe	:	Désactive les ports dans le menu Port COM
+# Principe	:	Actualise la liste des Ports COM dispo.
 # Dépandence:	import Serial_SQL_Logger_GUI
-# Appelé par:	Fonction événement m_COMactualiserMnuEvt
+# Appelé par:	Fonction événement: m_COMactualiserMnuEvt
+#									m_findPortToolEvt
 # 2014-04-19:	Création
 # 2015-02-28:	Pour Linux, ajout port série Bluetooth RFcommXX
+# 2015-05-06:	Séparation scan ports séries en fonction OS: Linux/Win
 #####################################################
 def FindCOM(self):
 	# efface la liste dans ComboBox
 	self.m_portComCbx.Clear()
 	print u"Ports dispo:"
-	# pour Linux, ajout port série Bluetooth RFcommXX
+	# scan pour Linux
 	if g_OSname == "Linux":
+		# Note: si appairage bluetooth fait alors fichier /dev/rfcomm0 présent
+		# on test la pésence /dev/rfcomm0 à /dev/refcomm9
 		for i in range(10):
 			RFport = '/dev/rfcomm' + str(i)
 			if os.path.exists(RFport):
 				self.m_portComCbx.Append(RFport)
-	# scan port serie dispo:
-	for n,s in scan():
-		print "(%d) %s" % (n,s)
-		MsgLog(self,"%s" % (s))
-		# activation menu port serie en fonction des COM dispo
-		self.m_portComCbx.Append(s)
-
-#####################################################
-# 					Fonction AddMemnuPortCOM(COMname)
-# Principe	:	Ajoute dynamiquement les ports COM
-#				dans le menu Port COM
-# Dépandence:	import Serial_SQL_Logger_GUI
-# Appelé par:	Fonction FindCOM()
-# 2014-07-26:	Création
-#####################################################
-def AddMemnuPortCOM(COMname):
-	self.COMname = wx.MenuItem( self.m_portComMnu, wx.ID_ANY, COMname, wx.EmptyString, wx.ITEM_RADIO )
-	self.m_portComMnu.AppendItem( self.m_COM1mnu )
-	self.m_COM1mnu.Enable( True )
-	self.Bind( wx.EVT_MENU, self.m_COM1mnuEvt, id = self.m_COM1mnu.GetId() )
+		# on poursuit la recherche des ports séries
+		for name in ScanLinux():
+			print name
+			# actualisation liste port serie en fonction des COM dispo
+			self.m_portComCbx.Append(name)
+	# scan pour Windows
+	else:
+		# scan port serie dispo:
+		for n,s in ScanWin():
+			print "(%d) %s" % (n,s)
+			MsgLog(self,"%s" % (s))
+			# actualisation liste port serie en fonction des COM dispo
+			self.m_portComCbx.Append(s)
 
 ###############################################################
 # 					Fonction CheckVitesse(COMname)
@@ -1616,7 +1555,7 @@ def MysqlInsert(self,message):
 #####################################################
 # 					Fonction MysqlShowTable(self)
 # Principe	:	Donne la liste des table SQL disponibles
-# Dépandence:	Aucune
+# Dépandence:	Import MySQLdb
 # Appelé par:	bouton GUI SQL
 # 2015-02-25:	Création
 #####################################################
@@ -1669,6 +1608,21 @@ def MysqlShowTable(self):
 			db.close()
 			print u"MysqlShowTable: base fermée. Fin"
 
+	
+#####################################################
+# 					Fonction character()
+# Principe	:	Adapte l'encodage en fonction version python
+# Notes		:	Repris de miniterm.py de pyserial
+# Dépandence:	Aucune
+# Appelé par:	reader()
+# 2015-05-06:	Création
+#####################################################
+def character(b):
+	if sys.version_info >= (3, 0):
+		return b
+	else:
+		return b.decode('latin1')
+
 
 
 #================ DEBUT APPLI ================
@@ -1693,7 +1647,9 @@ else:
 g_archiTab     = platform.architecture()
 g_architectBits = g_archiTab[0]+'s'
 print(u'g_architectBits='+g_architectBits)
-
+# detection version python
+print "detection version python:"
+print str(sys.version_info[0])+"."+str(sys.version_info[1])+str(sys.version_info[2])+" "+str(sys.version_info[3])
 # start GUI
 app = wx.App(False)
 #wx.InitAllImageHandlers()
@@ -1738,8 +1694,6 @@ gExtractNivDetailNum		= 1
 gCaractereSeparateurTxt		= ""
 gCaractereSeparateurEnable	= False
 gSQLlisteTable = []			# liste vide
-print 'type gSQLlisteTable:'
-print type(gSQLlisteTable)
 # init ligne status dans GUI
 screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
 screenHome.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
@@ -1748,6 +1702,21 @@ screenHome.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds
 screenHome.m_statusDecodeSerieTxt.SetLabel("Decodage Serie: " + gDecodeSerieTxt)
 screenHome.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: " + gEncodeSqlTxt)
 screenHome.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: " + gEncodeGuiTxt)
+# masquage par défaut des options SQL
+screenHome.m_separateurTxt.Hide()
+screenHome.m_separateurCbx.Hide()
+screenHome.spacer_10x20_01.Hide()
+screenHome.m_ExtractHorodateChk.Hide()
+screenHome.spacer_10x20_02.Hide()
+screenHome.m_ExtractCategorieChk.Hide()
+screenHome.spacer_10x20_03.Hide()
+screenHome.m_CategorieLbl.Hide()
+screenHome.m_CategorieTxt.Hide()
+screenHome.spacer_10x20_04.Hide()
+screenHome.m_ExtractNivDetailChk.Hide()
+screenHome.m_ExtractNivDetailLbl.Hide()
+screenHome.m_ExtractNivDetailNum.Hide()
+
 # affichage de l'écran principal
 screenHome.Show(True)
 # Démarrage de l'applications
