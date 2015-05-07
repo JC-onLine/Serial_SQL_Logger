@@ -1,7 +1,11 @@
 CHANGELOG
 =========
+### 2015-05-07 [commit]
+  * PyGUI: Changement couleurs 'thème Steam' pour compatibilité Win/Linux
+           cause couleurs custom non affichées sous linux.
+  * PyGUI: Ajout emplacement uptime (futur).
 
-### 2015-05-06
+### 2015-05-06 [commit]
   * Py: FindCOM(): Séparation scan ports séries en fonction OS: Linux/Win
   * Py: Suppresion AddMemnuPortCOM(COMname) obsolète
   * Py: Ajout gestion événement OnSerialRead pour rafraichir wxTextCtrl

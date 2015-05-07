@@ -21,7 +21,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetForegroundColour( wx.Colour( 170, 170, 170 ) )
-		self.SetBackgroundColour( wx.Colour( 100, 100, 100 ) )
+		self.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		self.m_timer1 = wx.Timer()
 		self.m_timer1.SetOwner( self, wx.ID_ANY )
@@ -33,8 +33,8 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menubar1.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
-		self.m_menubar1.SetForegroundColour( wx.Colour( 154, 154, 154 ) )
-		self.m_menubar1.SetBackgroundColour( wx.Colour( 98, 98, 98 ) )
+		self.m_menubar1.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_menubar1.SetBackgroundColour( wx.Colour( 144, 144, 144 ) )
 		
 		self.m_fichierMnu = wx.Menu()
 		self.m_LogFileDeco = wx.MenuItem( self.m_fichierMnu, wx.ID_ANY, u"Fichier log :", wx.EmptyString, wx.ITEM_NORMAL )
@@ -190,7 +190,7 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		bSizer_MAIN = wx.BoxSizer( wx.VERTICAL )
 		
-		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 1000,350 ), wx.TE_MULTILINE )
+		self.logTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 1000,345 ), wx.TE_MULTILINE )
 		self.logTextCtrl.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
 		self.logTextCtrl.SetForegroundColour( wx.Colour( 0, 255, 0 ) )
 		self.logTextCtrl.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
@@ -206,6 +206,8 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_separateurTxt = wx.StaticText( self, wx.ID_ANY, u"Séparateur", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_separateurTxt.Wrap( -1 )
+		self.m_separateurTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
 		bSizer_separateur.Add( self.m_separateurTxt, 0, wx.ALL, 5 )
 		
 		m_separateurCbxChoices = []
@@ -221,48 +223,58 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		bSizer_SQL_options.Add( self.spacer_10x20_01, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_ExtractHorodateChk = wx.CheckBox( self, wx.ID_ANY, u"Horodatage\ninclus dans logs", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer_SQL_options.Add( self.m_ExtractHorodateChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.m_ExtractHorodateChk.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer_SQL_options.Add( self.m_ExtractHorodateChk, 0, wx.ALL, 5 )
 		
 		self.spacer_10x20_02 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer_SQL_options.Add( self.spacer_10x20_02, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_ExtractCategorieChk = wx.CheckBox( self, wx.ID_ANY, u"Catégorie\ninclus dans logs", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
-		bSizer_SQL_options.Add( self.m_ExtractCategorieChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.m_ExtractCategorieChk.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer_SQL_options.Add( self.m_ExtractCategorieChk, 0, wx.ALL, 5 )
 		
 		self.spacer_10x20_03 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer_SQL_options.Add( self.spacer_10x20_03, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		bSizer6 = wx.BoxSizer( wx.VERTICAL )
+		bSizer_category = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_CategorieLbl = wx.StaticText( self, wx.ID_ANY, u"Ajout catégorie", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_CategorieLbl.Wrap( -1 )
-		bSizer6.Add( self.m_CategorieLbl, 0, wx.ALL, 5 )
+		self.m_CategorieLbl.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer_category.Add( self.m_CategorieLbl, 0, wx.ALL, 5 )
 		
 		self.m_CategorieTxt = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_CategorieTxt.SetBackgroundColour( wx.Colour( 130, 130, 130 ) )
 		
-		bSizer6.Add( self.m_CategorieTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		bSizer_category.Add( self.m_CategorieTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		
 		
-		bSizer_SQL_options.Add( bSizer6, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer_SQL_options.Add( bSizer_category, 0, 0, 5 )
 		
 		self.spacer_10x20_04 = wx.StaticBitmap( self, wx.ID_ANY, wx.Bitmap( u"Icons/spacer/spacer_10x20.png", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer_SQL_options.Add( self.spacer_10x20_04, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_ExtractNivDetailChk = wx.CheckBox( self, wx.ID_ANY, u"Niveau détail\ninclus dans logs", wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
-		bSizer_SQL_options.Add( self.m_ExtractNivDetailChk, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.m_ExtractNivDetailChk.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
 		
-		bSizer7 = wx.BoxSizer( wx.HORIZONTAL )
+		bSizer_SQL_options.Add( self.m_ExtractNivDetailChk, 0, wx.ALL, 5 )
+		
+		bSizer_numDetail = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.m_ExtractNivDetailLbl = wx.StaticText( self, wx.ID_ANY, u"Ajout num\ndétail", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_ExtractNivDetailLbl.Wrap( -1 )
-		bSizer7.Add( self.m_ExtractNivDetailLbl, 0, wx.ALL, 5 )
+		self.m_ExtractNivDetailLbl.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer_numDetail.Add( self.m_ExtractNivDetailLbl, 0, wx.ALL, 5 )
 		
 		self.m_ExtractNivDetailNum = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.SP_ARROW_KEYS, 0, 10, 1 )
-		bSizer7.Add( self.m_ExtractNivDetailNum, 0, wx.ALL, 5 )
+		bSizer_numDetail.Add( self.m_ExtractNivDetailNum, 0, wx.ALL, 5 )
 		
 		
-		bSizer_SQL_options.Add( bSizer7, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer_SQL_options.Add( bSizer_numDetail, 0, 0, 5 )
 		
 		self.m_compteurTxt = wx.StaticText( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_compteurTxt.Wrap( -1 )
@@ -278,49 +290,45 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		bSizer_appliStatus = wx.BoxSizer( wx.HORIZONTAL )
 		
 		bSizer_appliStatus.SetMinSize( wx.Size( -1,32 ) ) 
-		self.m_statusActionTextStatOLD = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,-1 ), 0 )
-		self.m_statusActionTextStatOLD.Wrap( -1 )
-		self.m_statusActionTextStatOLD.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		self.m_statusActionTextStat = wx.StaticText( self, wx.ID_ANY, u"Status action", wx.DefaultPosition, wx.Size( 250,-1 ), 0 )
+		self.m_statusActionTextStat.Wrap( -1 )
+		self.m_statusActionTextStat.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusActionTextStat.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
-		bSizer_appliStatus.Add( self.m_statusActionTextStatOLD, 0, wx.LEFT|wx.ALIGN_BOTTOM, 5 )
+		bSizer_appliStatus.Add( self.m_statusActionTextStat, 0, wx.LEFT|wx.ALIGN_BOTTOM, 5 )
 		
-		self.m_statusActionTextStat = wx.TextCtrl( self, wx.ID_ANY, u"test", wx.DefaultPosition, wx.Size( 250,-1 ), 0 )
-		self.m_statusActionTextStat.Enable( False )
+		self.m_statusComTextStat = wx.StaticText( self, wx.ID_ANY, u"Status COM", wx.DefaultPosition, wx.Size( 130,-1 ), 0 )
+		self.m_statusComTextStat.Wrap( -1 )
+		self.m_statusComTextStat.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusComTextStat.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
-		bSizer_appliStatus.Add( self.m_statusActionTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
+		bSizer_appliStatus.Add( self.m_statusComTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusComTextStatOLD = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 13,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
-		self.m_statusComTextStatOLD.Wrap( -1 )
-		self.m_statusComTextStatOLD.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
-		
-		bSizer_appliStatus.Add( self.m_statusComTextStatOLD, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
-		
-		self.m_statusComTextStat = wx.TextCtrl( self, wx.ID_ANY, u"test", wx.DefaultPosition, wx.Size( 130,-1 ), 0 )
-		self.m_statusComTextStat.Enable( False )
-		
-		bSizer_appliStatus.Add( self.m_statusComTextStat, 0, wx.LEFT|wx.ALIGN_BOTTOM, 5 )
-		
-		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 110,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusVitesseTextStat = wx.StaticText( self, wx.ID_ANY, u"Status vitesse", wx.DefaultPosition, wx.Size( 110,-1 ), 0 )
 		self.m_statusVitesseTextStat.Wrap( -1 )
-		self.m_statusVitesseTextStat.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		self.m_statusVitesseTextStat.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusVitesseTextStat.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		bSizer_appliStatus.Add( self.m_statusVitesseTextStat, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusDecodeSerieTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusDecodeSerieTxt = wx.StaticText( self, wx.ID_ANY, u"Status décode série", wx.DefaultPosition, wx.Size( 130,-1 ), 0 )
 		self.m_statusDecodeSerieTxt.Wrap( -1 )
-		self.m_statusDecodeSerieTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		self.m_statusDecodeSerieTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusDecodeSerieTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		bSizer_appliStatus.Add( self.m_statusDecodeSerieTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusEncodeSqlTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusEncodeSqlTxt = wx.StaticText( self, wx.ID_ANY, u"Status décode  SQL", wx.DefaultPosition, wx.Size( 130,-1 ), 0 )
 		self.m_statusEncodeSqlTxt.Wrap( -1 )
-		self.m_statusEncodeSqlTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		self.m_statusEncodeSqlTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusEncodeSqlTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		bSizer_appliStatus.Add( self.m_statusEncodeSqlTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
-		self.m_statusEncodeGuiTxt = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 130,-1 ), 0|wx.FULL_REPAINT_ON_RESIZE|wx.SUNKEN_BORDER )
+		self.m_statusEncodeGuiTxt = wx.StaticText( self, wx.ID_ANY, u"Status encode GUI", wx.DefaultPosition, wx.Size( 130,-1 ), 0 )
 		self.m_statusEncodeGuiTxt.Wrap( -1 )
-		self.m_statusEncodeGuiTxt.SetBackgroundColour( wx.Colour( 40, 40, 40 ) )
+		self.m_statusEncodeGuiTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_statusEncodeGuiTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		bSizer_appliStatus.Add( self.m_statusEncodeGuiTxt, 0, wx.ALIGN_BOTTOM|wx.LEFT, 5 )
 		
@@ -329,6 +337,17 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		
 		bSizer_MAIN.Add( bSizer_appliStatus, 0, wx.EXPAND, 5 )
+		
+		bSizer_ligne = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticline3 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		self.m_staticline3.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_staticline3.SetBackgroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer_ligne.Add( self.m_staticline3, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer_MAIN.Add( bSizer_ligne, 1, wx.EXPAND, 5 )
 		
 		bSizer_appliLogs_OS_pyVersion = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -347,36 +366,73 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		
 		self.m_OsTxt = wx.StaticText( self, wx.ID_ANY, u"OS :", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_OsTxt.Wrap( -1 )
-		bSizer_OS.Add( self.m_OsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		self.m_OsTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_OsTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
+		bSizer_OS.Add( self.m_OsTxt, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
 		
 		self.m_bmpOS = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_bmpOS.SetBackgroundColour( wx.Colour( 100, 100, 100 ) )
+		self.m_bmpOS.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
 		
 		bSizer_OS.Add( self.m_bmpOS, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_OSdetailsTxt = wx.StaticText( self, wx.ID_ANY, u"details", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_OSdetailsTxt.Wrap( -1 )
-		bSizer_OS.Add( self.m_OSdetailsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		self.m_OSdetailsTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_OSdetailsTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
+		bSizer_OS.Add( self.m_OSdetailsTxt, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
 		
 		self.m_ArchBitsTxt = wx.StaticText( self, wx.ID_ANY, u"xx bits", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_ArchBitsTxt.Wrap( -1 )
-		bSizer_OS.Add( self.m_ArchBitsTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		self.m_ArchBitsTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_ArchBitsTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
+		bSizer_OS.Add( self.m_ArchBitsTxt, 0, wx.RIGHT|wx.LEFT|wx.ALIGN_BOTTOM, 5 )
 		
 		
-		bSizer9.Add( bSizer_OS, 1, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		bSizer9.Add( bSizer_OS, 1, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.TOP, 5 )
 		
 		bSizer_pyVersion = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.m_PyVersionLbl = wx.StaticText( self, wx.ID_ANY, u"Python version:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_PyVersionLbl.Wrap( -1 )
+		self.m_PyVersionLbl.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_PyVersionLbl.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
 		bSizer_pyVersion.Add( self.m_PyVersionLbl, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_staticline2 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer_pyVersion.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
 		
 		self.m_PyVersionTxt = wx.StaticText( self, wx.ID_ANY, u"xx.yy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_PyVersionTxt.Wrap( -1 )
+		self.m_PyVersionTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_PyVersionTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
 		bSizer_pyVersion.Add( self.m_PyVersionTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
 		
 		
 		bSizer9.Add( bSizer_pyVersion, 1, wx.EXPAND, 5 )
+		
+		bSizer_upTime = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_upTimeLbl = wx.StaticText( self, wx.ID_ANY, u"Up time :", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_upTimeLbl.Wrap( -1 )
+		self.m_upTimeLbl.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_upTimeLbl.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
+		bSizer_upTime.Add( self.m_upTimeLbl, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		self.m_upTimeTxt = wx.StaticText( self, wx.ID_ANY, u"xx.yy", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_upTimeTxt.Wrap( -1 )
+		self.m_upTimeTxt.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		self.m_upTimeTxt.SetBackgroundColour( wx.Colour( 96, 96, 96 ) )
+		
+		bSizer_upTime.Add( self.m_upTimeTxt, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT, 5 )
+		
+		
+		bSizer9.Add( bSizer_upTime, 1, wx.EXPAND, 5 )
 		
 		
 		bSizer_appliLogs_OS_pyVersion.Add( bSizer9, 1, wx.EXPAND, 5 )
@@ -389,12 +445,12 @@ class FenetrePrincipaleClass ( wx.Frame ):
 		self.Layout()
 		self.m_toolBar1 = self.CreateToolBar( wx.TB_FLAT|wx.TB_HORIZONTAL|wx.TB_TEXT, wx.ID_ANY ) 
 		self.m_toolBar1.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
-		self.m_toolBar1.SetForegroundColour( wx.Colour( 180, 180, 180 ) )
-		self.m_toolBar1.SetBackgroundColour( wx.Colour( 230, 230, 230 ) )
+		self.m_toolBar1.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_toolBar1.SetBackgroundColour( wx.Colour( 128, 128, 128 ) )
 		
 		self.m_findPortTool = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"Recherche Port COM", wx.Bitmap( u"Icons/ToolBar/Find.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Rechercher les ports de communication", u"Rechercher les ports de communication", None ) 
 		
-		self.m_COMdispoTxt = wx.StaticText( self.m_toolBar1, wx.ID_ANY, u"  Port COM dispo:  ", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_COMdispoTxt = wx.StaticText( self.m_toolBar1, wx.ID_ANY, u"   Port\n  dispo:  ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_COMdispoTxt.Wrap( -1 )
 		self.m_COMdispoTxt.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		

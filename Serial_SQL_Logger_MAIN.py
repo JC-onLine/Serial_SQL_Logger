@@ -713,10 +713,10 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 					# pas d'erreur, le port serie est sur la machine, on continue:
 					erreurGbl = False
 					CheckVitesse(COMvitesseGbl)		# coche la vitesse
-					self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
-					self.m_statusActionTextStat.SetLabel("Pret.")
+					self.m_statusComTextStat.SetLabel("Port serie:\n" + COMselectGbl)
+					self.m_statusActionTextStat.SetLabel("Action:\nPret.")
 					MsgLog(self, u"Port COM: "+COMselectGbl+ u"  Vitesse Port: "+ str(COMvitesseGbl))
-					self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+					self.m_statusVitesseTextStat.SetLabel("Vitesse:\n"+str(COMvitesseGbl)+" bds")
 					# memorisation du profile pour titre appli
 					ProfileNameGbl = self.profileFileName
 					#Fermeture du port série
@@ -829,11 +829,11 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# scan port serie dispo:
 		print(u"<Actualiser> ")
 		MsgLog(self,u'Recherche des Ports COM disponibles ...')
-		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
+		self.m_statusActionTextStat.SetLabel(u"Action:\nRecherche ports COM en cours...")
 		FindCOM(self)
 		print(u"<FIN> ")
 		MsgLog(self,u'Recherche terminer: choisissez un port serie')
-		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port serie")
+		self.m_statusActionTextStat.SetLabel(u"Action:\nRecherche terminer: choisissez un port serie")
 	#  menu <Select.Manuelle>
 	def m_COMmanuMnuEvt(self,event):
 		global COMselectGbl
@@ -844,8 +844,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			COMselectGbl=box.GetValue()
 		print(u"Selection manuelle: "+ COMselectGbl)
 		MsgLog(self, u"Selection manuelle Port COM: "+ COMselectGbl)
-		self.m_statusActionTextStat.SetLabel("Selection manuelle: "+ COMselectGbl)
-		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
+		self.m_statusActionTextStat.SetLabel("Action:\nSelection manuelle: "+ COMselectGbl)
+		self.m_statusComTextStat.SetLabel("Port serie:\n" + COMselectGbl)
 	# capture de l'événement selection menu COM non selectionné
 	def m_COMnonSelectEvt(self,event):
 		global COMselectGbl
@@ -853,8 +853,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMselectGbl = "Non select."
 		COMvitesseGbl = 115200
 		MsgLog(self, u"Nouveau profile:    Port COM: "+COMselectGbl+ u"    Vitesse Port: "+ str(COMvitesseGbl))
-		self.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
-		self.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
+		self.m_statusVitesseTextStat.SetLabel("Vitesse:\n"+str(COMvitesseGbl)+" bds")
+		self.m_statusComTextStat.SetLabel("Port serie:\n"+COMselectGbl)
 
 	# capture de l'événement selection ComboBox Port COM
 	def m_portComCbxEvt( self, event ):
@@ -864,8 +864,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMselectGbl  = bcb.GetString(idx)					# correction depuis wx2.8-examples
 		print(u"COMselectGbl: " + COMselectGbl)
 		MsgLog(self, u"Selection Port COM: "+ COMselectGbl)
-		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
-		self.m_statusActionTextStat.SetLabel("Pret.")
+		self.m_statusComTextStat.SetLabel("Port serie:\n" + COMselectGbl)
+		self.m_statusActionTextStat.SetLabel("Action:\nPret.")
 
 	def m_portComCbxEvtOnText( self, event ):
 		event.Skip()
@@ -879,8 +879,8 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		COMselectGbl = event.GetString()
 		print(u"COMselectGbl: " + COMselectGbl)
 		MsgLog(self, u"Selection Port COM: "+ COMselectGbl)
-		self.m_statusComTextStat.SetLabel("Port serie: " + COMselectGbl)
-		self.m_statusActionTextStat.SetLabel("Pret.")
+		self.m_statusComTextStat.SetLabel("Port serie:\n" + COMselectGbl)
+		self.m_statusActionTextStat.SetLabel("Actio:\nPret.")
 	
 		
 	####################################
@@ -1139,11 +1139,11 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		# scan port serie dispo:
 		print(u"<Actualiser> ")
 		MsgLog(self, u'Recherche des Ports COM disponibles ...')
-		self.m_statusActionTextStat.SetLabel(u"Recherche ports COM en cours...")
+		self.m_statusActionTextStat.SetLabel(u"Action:\nRecherche ports COM...")
 		FindCOM(self)
 		print(u"<FIN> ")
 		MsgLog(self,u'Recherche terminer: choisissez un port serie')
-		self.m_statusActionTextStat.SetLabel(u"Recherche terminer: choisissez un port série")
+		self.m_statusActionTextStat.SetLabel(u"Action:\nChoisissez un port série.")
 
 	# Icone <Run Stop>
 	def m_RunStopToolEvt(self,event):
@@ -1695,13 +1695,13 @@ gCaractereSeparateurTxt		= ""
 gCaractereSeparateurEnable	= False
 gSQLlisteTable = []			# liste vide
 # init ligne status dans GUI
-screenHome.m_statusActionTextStat.SetLabel("Choisissez un port serie.")
-screenHome.m_statusComTextStat.SetLabel("Port serie: "+COMselectGbl)
-screenHome.m_statusVitesseTextStat.SetLabel("Vitesse: "+str(COMvitesseGbl)+" bds")
+screenHome.m_statusActionTextStat.SetLabel("Action:\nChoisissez un port serie.")
+screenHome.m_statusComTextStat.SetLabel("Port serie:\n"+COMselectGbl)
+screenHome.m_statusVitesseTextStat.SetLabel("Vitesse:\n"+str(COMvitesseGbl)+" bds")
 # init status encodage
-screenHome.m_statusDecodeSerieTxt.SetLabel("Decodage Serie: " + gDecodeSerieTxt)
-screenHome.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: " + gEncodeSqlTxt)
-screenHome.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: " + gEncodeGuiTxt)
+screenHome.m_statusDecodeSerieTxt.SetLabel("Decodage Serie:\n" + gDecodeSerieTxt)
+screenHome.m_statusEncodeSqlTxt.SetLabel("Encodage SQL:\n" + gEncodeSqlTxt)
+screenHome.m_statusEncodeGuiTxt.SetLabel("Encodage GUI:\n" + gEncodeGuiTxt)
 # masquage par défaut des options SQL
 screenHome.m_separateurTxt.Hide()
 screenHome.m_separateurCbx.Hide()

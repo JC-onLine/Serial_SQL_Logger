@@ -23,11 +23,9 @@ long_line_behaviour=1
 long_line_column=80
 
 [files]
-current_page=3
-FILE_NAME_0=25179;Python;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2FDocuments%2FDev%2FSerial_SQL_Logger%2FSerial_SQL_Logger_MAIN.py;0;4
-FILE_NAME_1=247;Markdown;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2FDocuments%2FDev%2FSerial_SQL_Logger%2FCHANGELOG.md;0;4
-FILE_NAME_2=170;None;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2Ftmp.txt;0;4
-FILE_NAME_3=192;None;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2FDocuments%2FDev%2Fcommit_2015-05-07a.txt;0;4
+current_page=0
+FILE_NAME_0=51572;Python;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2FDocuments%2FDev%2FSerial_SQL_Logger%2FSerial_SQL_Logger_MAIN.py;0;4
+FILE_NAME_1=122;Markdown;0;EUTF-8;1;1;0;%2Fhome%2Fjc%2FDocuments%2FDev%2FSerial_SQL_Logger%2FCHANGELOG.md;0;4
 
 [build-menu]
 C++FT_00_LB=_Compiler
