@@ -27,8 +27,6 @@ import Serial_SQL_Logger_GUI
 # acces à la librairie du port série
 import serial
 import glob
-# acces à la librairie de la gestion du temps
-from time import sleep
 # acces fonctions systeme
 import os
 import platform
@@ -36,7 +34,10 @@ import platform
 import threading
 import sys
 # gestion du temps
-import time
+from time import sleep
+from time import strftime
+from time import gmtime
+from uptime import uptime
 # gestion de config/profile
 import ConfigParser
 # gestion base MySQL
@@ -269,6 +270,13 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			bmpCirculaireIndexGbl=bmpCirculaireIndexGbl+1
 			if bmpCirculaireIndexGbl > 12:
 				bmpCirculaireIndexGbl = 1
+		# affichage uptime
+		global gUptime
+		global gUptimeOld
+		gUptime   = strftime("%dd %H:%M:%S", gmtime(uptime()))
+		if (gUptime != gUptimeOld):
+			self.m_upTimeTxt.SetLabel(gUptime)
+			gUptimeOld = gUptime
 
 	# capture de l'événement clic 'RUN'
 	def m_bntRunEvt(self,event):
@@ -515,14 +523,15 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 			enableBlinkGbl = False
 			# lecture du port série, décodage à la voléeselon selection menu 'encodage / entrée série'
 			##serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
-			##serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
 			try:
 #				serialData = character(self.portSerie.read(1))
-				serialData = self.portSerie.read(1)
+				serialData = self.portSerie.read(1).decode(gDecodeSerieTxt, errors='replace')
+				#serialData = self.portSerie.read(1)
 				# caractère reçu ?
 				if serialData:
 					# Filtrage des guillemets à cause de SQL
-					if ((serialData == "'") or (serialData == '"') or (serialData == '\n')):
+##					if ((serialData == "'") or (serialData == '"') or (serialData == '\n')):
+					if ((serialData == "'") or (serialData == '"')):
 						serialData = ""
 					serialDataInWaiting= self.portSerie.inWaiting()     #regarde s'il y a encore des données à lire
 #					if serialDataInWaiting:
@@ -965,7 +974,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gDecodeSerieISO_8859_15Chk	= False
 		gDecodeSerieCP850Chk		= False
 		MsgLog(self, u"Menu encodage: Entree Serie -> UTF-8 (Unicode )")
-		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: " + gDecodeSerieTxt)
+		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: \r" + gDecodeSerieTxt)
 	# menu <Décodage entrée série / Win1252>
 	def m_decodeWin1252MnuEvt(self,event):
 		global gDecodeSerieTxt
@@ -979,7 +988,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gDecodeSerieISO_8859_15Chk	= False
 		gDecodeSerieCP850Chk		= False
 		MsgLog(self, u"Menu encodage: Entree Serie -> cp1252 (Windows ,Western)")
-		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: " + gDecodeSerieTxt)
+		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: \r" + gDecodeSerieTxt)
 	# menu <Décodage entrée série / ISO-8859-15>
 	def m_decodeISO_8859_15MnuEvt(self,event):
 		global gDecodeSerieTxt
@@ -993,7 +1002,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gDecodeSerieISO_8859_15Chk	= True
 		gDecodeSerieCP850Chk		= False
 		MsgLog(self, u"Menu encodage: Entree Serie -> ISO-8859-15 (Latin-1, West Europe,Touche Euro)")
-		self.m_statusDecodeSerieTxt.SetLabel("DEcodage serie: " + gDecodeSerieTxt)
+		self.m_statusDecodeSerieTxt.SetLabel("DEcodage serie: \r" + gDecodeSerieTxt)
 	# menu <Décodage entrée série / cp850>
 	def m_decodeCP850MnuEvt(self,event):
 		global gDecodeSerieTxt
@@ -1007,7 +1016,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gDecodeSerieISO_8859_15Chk	= False
 		gDecodeSerieCP850Chk		= True
 		MsgLog(self, u"Menu encodage: Entree Serie -> cp850 (MS-DOS )")
-		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: " + gDecodeSerieTxt)
+		self.m_statusDecodeSerieTxt.SetLabel("Decodage serie: \r" + gDecodeSerieTxt)
 
 	######## MENU [Encodage SQL] ########
 	# menu <Encodage sortie SQL / UTF-8>
@@ -1023,7 +1032,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeSqlISO_8859_15Chk	= False
 		gEncodeSqlCP850Chk			= False
 		MsgLog(self, u"Menu encodage: Sortie SQL -> UTF-8 (Unicode )")
-		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: " + gEncodeSqlTxt)
+		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: \r" + gEncodeSqlTxt)
 	# menu <Encodage sortie SQL / Win1252>
 	def m_encodeWin1252MnuEvt(self,event):
 		global gEncodeSqlTxt
@@ -1037,7 +1046,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeSqlISO_8859_15Chk	= False
 		gEncodeSqlEncodeCP850Chk	= False
 		MsgLog(self, u"Menu encodage: Sortie SQL -> cp1252 (Windows ,Western)")
-		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: "+ gEncodeSqlTxt)
+		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: \r"+ gEncodeSqlTxt)
 	# menu <Encodage sortie SQL / ISO-8859-15>
 	def m_encodeISO_8859_15MnuEvt(self,event):
 		global gEncodeSqlTxt
@@ -1051,7 +1060,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeSqlUTF8Chk			= False
 		gEncodeSqlCP850Chk			= False
 		MsgLog(self, u"Menu encodage: Sortie SQL -> ISO-8859-15 (Latin-1, West Europe,Touche Euro)")
-		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: "+ gEncodeSqlTxt)
+		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: \r"+ gEncodeSqlTxt)
 	# menu <Encodage sortie SQL / cp850>
 	def m_encodeCP850MnuEvt(self,event):
 		global gEncodeSqlTxt
@@ -1065,7 +1074,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeSqlISO_8859_15Chk	= False
 		gEncodeSqlCP850Chk			= True
 		MsgLog(self, u"Menu encodage: Sortie SQL -> cp850 (MS-DOS )")
-		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: "+ gEncodeSqlTxt)
+		self.m_statusEncodeSqlTxt.SetLabel("Encodage SQL: \r"+ gEncodeSqlTxt)
 
 	######## MENU [Encodage GUI] ########
 	# menu <Encodage sortie SQL / UTF-8>
@@ -1081,7 +1090,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeGuiISO_8859_15Chk	= False
 		gEncodeGuiCP850Chk			= False
 		MsgLog(self, u"Menu encodage: Sortie Affichage -> UTF-8 (Unicode )")
-		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: "+ gEncodeGuiTxt)
+		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: \r"+ gEncodeGuiTxt)
 	# menu <Encodage sortie SQL / Win1252>
 	def m_encodeGuiWin1252MnuEvt(self,event):
 		global gEncodeGuiTxt
@@ -1095,7 +1104,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeGuiISO_8859_15Chk	= False
 		gEncodeGuiEncodeCP850Chk	= False
 		MsgLog(self, u"Menu encodage: Sortie Affichage -> cp1252 (Windows ,Western)")
-		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: "+ gEncodeGuiTxt)
+		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: \r"+ gEncodeGuiTxt)
 	# menu <Encodage sortie SQL / cp850>
 	def m_encodeGuiCP850MnuEvt(self,event):
 		global gEncodeGuiTxt
@@ -1109,7 +1118,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeGuiISO_8859_15Chk	= False
 		gEncodeGuiCP850Chk			= True
 		MsgLog(self, u"Menu encodage: Sortie Affichage -> cp850 (MS-DOS )")
-		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: "+ gEncodeGuiTxt)
+		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: \r"+ gEncodeGuiTxt)
 	# menu <Encodage sortie SQL / ISO-8859-15>
 	def m_encodeISO_8859_15MnuEvt(self,event):
 		global gEncodeGuiTxt
@@ -1123,7 +1132,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 		gEncodeGuiISO_8859_15Chk	= True
 		gEncodeGuiCP850Chk			= False
 		MsgLog(self, u"Menu encodage: Sortie Affichage -> ISO-8859-15 (Latin-1, West Europe,Touche Euro)")
-		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: "+ gEncodeGuiTxt)
+		self.m_statusEncodeGuiTxt.SetLabel("Encodage GUI: \r"+ gEncodeGuiTxt)
 
 	# capture de l'événement clic 'MySQL INSERT'
 	def m_mysqlInsertEvt(self,event):
@@ -1249,7 +1258,7 @@ class screenMain(Serial_SQL_Logger_GUI.FenetrePrincipaleClass):
 # 2014-06-01:	Création
 #####################################################
 def MsgLog(self,message):
-	self.logAppliTextCtrl.WriteText(u'\n' + time.strftime(u'%Y-%m-%d %H:%M:%S  ' + message))
+	self.logAppliTextCtrl.WriteText(u'\n' + strftime(u'%Y-%m-%d %H:%M:%S  ' + message))
 
 #####################################################
 # 					Fonction AppliTitre(self)
@@ -1694,6 +1703,9 @@ gExtractNivDetailNum		= 1
 gCaractereSeparateurTxt		= ""
 gCaractereSeparateurEnable	= False
 gSQLlisteTable = []			# liste vide
+# update
+gUptime    = 0
+gUptimeOld = 0
 # init ligne status dans GUI
 screenHome.m_statusActionTextStat.SetLabel("Action:\nChoisissez un port serie.")
 screenHome.m_statusComTextStat.SetLabel("Port serie:\n"+COMselectGbl)

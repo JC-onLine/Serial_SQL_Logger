@@ -21,7 +21,8 @@ Dependance:
 	Le fichier principale Python est `Serial_SQL_Logger_MAIN.py`
 	
 	Interface graphique `Serial_SQL_Logger_GUI_GUI.py`
-	GUI developpee avec `wxFormBuilder v3.4.2 beta (unicode)`
+	GUI developpee avec `wxFormBuilder v3.5.0 beta (unicode)`
+	Executable windows, fonctionne aussi sous wine ubuntu 15.04 Gnome3.14
 
 Installation Windows7:
 ---------------------

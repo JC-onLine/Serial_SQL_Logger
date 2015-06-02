@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+### 2015-06-02 [commit]
+  * Py: Decodage serial décommenté.
+  *	Py: Ajout uptime
+  * Py: Correction /r label encodage
+  * README: Correction version wxFormBuilder: wxFormBuilder
+
 ### 2015-05-07 [commit]
   * PyGUI: Changement couleurs 'thème Steam' pour compatibilité Win/Linux
            cause couleurs custom non affichées sous linux.
